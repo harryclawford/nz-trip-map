@@ -286,6 +286,19 @@ header {
   background: rgba(22,27,34,0.9); border: 1px solid #30363d; border-radius: 8px;
   padding: 2px 7px; font-size: 10px; color: #8b949e; white-space: nowrap;
 }
+.card-carousel{position:relative;width:100%;height:200px;overflow:hidden;border-radius:10px 10px 0 0;background:#0d1117;flex-shrink:0}
+.carousel-track{display:flex;height:100%;transition:transform .3s ease;will-change:transform}
+.carousel-slide{min-width:100%;height:100%;flex-shrink:0}
+.carousel-slide img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.85)}
+.carousel-dots{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:2}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:background .2s;border:none;padding:0}
+.carousel-dot.active{background:#fff}
+.carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);border:none;color:#fff;font-size:18px;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;opacity:0;transition:opacity .2s;line-height:1}
+.card-carousel:hover .carousel-arrow{opacity:1}
+.carousel-arrow.prev{left:8px}
+.carousel-arrow.next{right:8px}
+@media(max-width:640px){.card-carousel{height:180px}.carousel-arrow{display:none!important}}
+.lodging-card,.dining-card,.day-card{overflow:hidden}
 </style>
 </head>
 <body>
@@ -337,7 +350,7 @@ const days = [
     locationId: "christchurch", coords: [-43.5321, 172.6362], color: "#58a6ff",
     activities: ["Land AKL/SYD Airport", "Domestic flight to Christchurch"],
     stay: "Christchurch BnB", drive: null,
-    photo: "https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg","https://upload.wikimedia.org/wikipedia/commons/5/54/Christchurch_Botanic_Gardens_-_geograph.org.uk_-_697988.jpg","https://upload.wikimedia.org/wikipedia/commons/e/e4/Christchurch_Art_Gallery_from_the_square.JPG"],
     meme: "\"It's called the Garden City\" 🌸 ...bro we just flew 10 hours",
     vibes: "Tired but excited 😴✈️"
   },
@@ -346,7 +359,7 @@ const days = [
     locationId: "tekapo", coords: [-44.0038, 170.4786], color: "#3fb950",
     activities: ["3 hr drive from Christchurch", "Pit stops: Ashburton, Methven, Geraldine, Rakaia Gorge, Fairlie", "Tour around Lake Tekapo"],
     stay: "BnB Lodge with hot tub 🛁", drive: "3 hrs from Christchurch",
-    photo: "https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Lake_Tekapo_-_New_Zealand.jpg/1280px-Lake_Tekapo_-_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/1/18/Lake_Tekapo_and_lupins.jpg"],
     meme: "Sheep spotted count: lost track after 847 🐑🐑🐑",
     vibes: "Road trip mode activated 🚗🎵"
   },
@@ -355,7 +368,7 @@ const days = [
     locationId: "tekapo", coords: [-44.0038, 170.4786], color: "#3fb950",
     activities: ["Peninsula Walkway / Lakeside Trail", "Lake Alexandrina", "Tekapo Springs"],
     stay: "BnB Lodge with hot tub 🛁", drive: null,
-    photo: "https://upload.wikimedia.org/wikipedia/commons/5/57/Church_of_the_Good_Shepherd%2C_Tekapo_01.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/5/57/Church_of_the_Good_Shepherd%2C_Tekapo_01.jpg","https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg","https://upload.wikimedia.org/wikipedia/commons/1/18/Lake_Tekapo_and_lupins.jpg"],
     meme: "The lake is THIS blue in real life. Instagram didn't lie for once 😤",
     vibes: "Main character energy 💅🏔️"
   },
@@ -364,7 +377,7 @@ const days = [
     locationId: "mtcook", coords: [-43.7359, 170.0966], color: "#f0883e",
     activities: ["1.5 hr drive to Aoraki/Mt Cook Village", "Mt Cook Alpine Salmon Shop", "Picnic next to Lake Pukaki", "Tasman Glacier View Track (1.5km ~40 mins)"],
     stay: "Mt Cook Village BnB", drive: "1.5 hrs from Lake Tekapo",
-    photo: "https://upload.wikimedia.org/wikipedia/commons/0/08/LakePukakiNov232024_01.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/0/08/LakePukakiNov232024_01.jpg","https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg","https://upload.wikimedia.org/wikipedia/commons/4/44/Tasman_Glacier.jpg"],
     meme: "One does not simply walk into Mt Cook... actually you can. There are signs. 🧙‍♂️",
     vibes: "Full Tolkien mode 🏔️💍"
   },
@@ -373,7 +386,7 @@ const days = [
     locationId: "mtcook", coords: [-43.7359, 170.0966], color: "#f0883e",
     activities: ["Hooker Valley Track (3–4 hrs, flat road)", "or Kea Point Track (3km ~2 hrs, stairs)", "Glentanner Park / Aoraki Alpine Lodge", "Outdoor BBQ picnic"],
     stay: "Mt Cook Village BnB", drive: null,
-    photo: "https://upload.wikimedia.org/wikipedia/commons/2/23/Stocking_Stream_Shelter_in_Hooker_Valley_in_front_of_Aoraki_Mount_Cook_Range.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/2/23/Stocking_Stream_Shelter_in_Hooker_Valley_in_front_of_Aoraki_Mount_Cook_Range.jpg","https://upload.wikimedia.org/wikipedia/commons/1/10/Hooker_Lake_and_Aoraki.jpg","https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg"],
     meme: "\"It's flat, easy walking\" they said 😮‍💨 *dies on the return leg*",
     vibes: "We're hikers now apparently 🥾😅"
   },
@@ -382,7 +395,7 @@ const days = [
     locationId: "gibbston", coords: [-45.0132, 168.9481], color: "#bc8cff",
     activities: ["2.5 hr drive to Cromwell", "Winery visits in Gibbston Valley"],
     stay: "Winery cottage 🍷", drive: "2.5 hrs from Mt Cook",
-    photo: "https://upload.wikimedia.org/wikipedia/commons/1/1c/Vineyard_in_Gibbston_Valley_in_South_Island%2C_New_Zealand_-_Central_Otago_wine_region.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/1/1c/Vineyard_in_Gibbston_Valley_in_South_Island%2C_New_Zealand_-_Central_Otago_wine_region.jpg","https://upload.wikimedia.org/wikipedia/commons/4/40/Peregrine_Winery%2C_Gibbston.jpg","https://upload.wikimedia.org/wikipedia/commons/5/5d/Central_Otago_wine_region.jpg"],
     meme: "\"Wine tasting\" = technically drinking before noon. But make it classy 🍷😇",
     vibes: "Sophisticated degenerates 🍇✨"
   },
@@ -391,7 +404,7 @@ const days = [
     locationId: "queenstown", coords: [-45.0312, 168.6626], color: "#ff7b72",
     activities: ["Optional: morning winery visit", "1 hr drive to Queenstown"],
     stay: "Queenstown BnB", drive: "~1 hr from Gibbston",
-    photo: "https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%288168013172%29.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%288168013172%29.jpg","https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/2/29/Queenstown_at_night.jpg"],
     meme: "Queenstown: where you plan to bungee jump and end up just eating burgers instead 🍔",
     vibes: "Adventure capital... of eating 🏔️🍔"
   },
@@ -400,7 +413,7 @@ const days = [
     locationId: "queenstown", coords: [-45.0312, 168.6626], color: "#ff7b72",
     activities: ["TSS Earnslaw cruise? 🚢", "Explore Queenstown"],
     stay: "Queenstown BnB", drive: null,
-    photo: "https://upload.wikimedia.org/wikipedia/commons/1/19/TSS_Earnslaw.jpg",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/1/19/TSS_Earnslaw.jpg","https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%228168013172%29.jpg","https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg"],
     meme: "Boarding a 112-year-old steam ship. Peak confidence. No notes. 🚢🔥",
     vibes: "Last full day, maximum chaos 🎉"
   },
@@ -409,7 +422,7 @@ const days = [
     locationId: "queenstown", coords: [-45.0312, 168.6626], color: "#8b949e",
     activities: ["Depart to AKL/SYD Airport", "Transit to HKG 🏠"],
     stay: null, drive: null,
-    photo: "https://upload.wikimedia.org/wikipedia/commons/c/c8/Auckland_International_Airport_2017_aerial.png",
+    photos: ["https://upload.wikimedia.org/wikipedia/commons/c/c8/Auckland_International_Airport_2017_aerial.png","https://upload.wikimedia.org/wikipedia/commons/1/19/TSS_Earnslaw.jpg","https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%228168013172%29.jpg"],
     meme: "Goodbye NZ 😭 Hello 12-hour flight and 47 unread emails 💀",
     vibes: "Post-trip depression loading... 🥲"
   }
@@ -425,6 +438,7 @@ const locations = [
         type: "Boutique Hotel", price: "$$$",
         costNote: "~NZD $1,050–1,500/night", costDetail: "3 rooms for 6 pax",
         note: "Best address in Christchurch. Parkside location, impeccable service, beautiful rooms.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg","https://upload.wikimedia.org/wikipedia/commons/5/54/Christchurch_Botanic_Gardens_-_geograph.org.uk_-_697988.jpg"],
         status: "deciding",
         coords: [-43.5274, 172.6417],
         bookingUrl: "https://www.thegeorge.com/",
@@ -435,6 +449,7 @@ const locations = [
         type: "Heritage B&B", price: "$$",
         costNote: "~NZD $450–700/night", costDetail: "3 rooms for 6 pax",
         note: "Victorian mansion, 10 min walk to city centre. Elegant, personal, great breakfast.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/e/e4/Christchurch_Art_Gallery_from_the_square.JPG","https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg"],
         status: "deciding",
         coords: [-43.5315, 172.6381],
         bookingUrl: "https://www.booking.com/hotel/nz/elizas-manor.html",
@@ -447,6 +462,7 @@ const locations = [
         type: "All-day brunch café",
         dish: "Smashed avo toast + cold brew",
         vibe: "☀️ Best brunch spot in CHC — lively, packed on weekends",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/5/54/Christchurch_Botanic_Gardens_-_geograph.org.uk_-_697988.jpg","https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg"],
         status: "deciding",
         coords: [-43.5292, 172.6368],
         mapsUrl: "https://maps.google.com/?q=Hello+Sunday+Christchurch+NZ"
@@ -456,6 +472,7 @@ const locations = [
         type: "Wine bar / restaurant",
         dish: "Local pinot noir + shared boards",
         vibe: "🍷 Sophisticated but relaxed — perfect first-night dinner",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/e/e4/Christchurch_Art_Gallery_from_the_square.JPG","https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg"],
         status: "deciding",
         coords: [-43.5301, 172.6352],
         mapsUrl: "https://maps.google.com/?q=Fiddlesticks+Christchurch+NZ"
@@ -465,6 +482,7 @@ const locations = [
         type: "Gastropub",
         dish: "Burger + whatever's on tap",
         vibe: "🍺 Chill spot if you just want to decompress after the flight",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg","https://upload.wikimedia.org/wikipedia/commons/5/54/Christchurch_Botanic_Gardens_-_geograph.org.uk_-_697988.jpg"],
         status: "deciding",
         coords: [-43.5310, 172.6340],
         mapsUrl: "https://maps.google.com/?q=The+Pog+Christchurch+NZ"
@@ -480,6 +498,7 @@ const locations = [
         type: "Lakefront Resort", price: "$$$",
         costNote: "~NZD $550–800/night", costDetail: "1× 3-bedroom apartment fits 6",
         note: "Right on the lakefront. Stunning turquoise views, spa, outdoor hot pools. The one.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg","https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Lake_Tekapo_-_New_Zealand.jpg/1280px-Lake_Tekapo_-_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/5/57/Church_of_the_Good_Shepherd%2C_Tekapo_01.jpg"],
         status: "deciding",
         coords: [-44.0042, 170.4751],
         bookingUrl: "https://www.peppers.co.nz/bluewater/",
@@ -490,6 +509,7 @@ const locations = [
         type: "Hostel / B&B", price: "$",
         costNote: "~NZD $280–420/night", costDetail: "3 rooms for 6 pax",
         note: "Small, cozy, hosts are legends. Private hot tub with direct lake views. Feels like home.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/1/18/Lake_Tekapo_and_lupins.jpg","https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg"],
         status: "deciding",
         coords: [-44.0058, 170.4802],
         bookingUrl: "https://www.tekapohostelnz.com/",
@@ -502,6 +522,7 @@ const locations = [
         type: "Japanese",
         dish: "Salmon sashimi (local Mt Cook salmon — seriously)",
         vibe: "🍣 Surprisingly legit Japanese in the middle of NZ's south island",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg","https://upload.wikimedia.org/wikipedia/commons/5/57/Church_of_the_Good_Shepherd%2C_Tekapo_01.jpg"],
         status: "deciding",
         coords: [-44.0031, 170.4789],
         mapsUrl: "https://maps.google.com/?q=Kohan+Restaurant+Lake+Tekapo"
@@ -511,6 +532,7 @@ const locations = [
         type: "NZ Classic",
         dish: "Lamb rack + Mackenzie Basin pinot",
         vibe: "🥩 Classic NZ cooking, solid every time, lake views",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Lake_Tekapo_-_New_Zealand.jpg/1280px-Lake_Tekapo_-_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg"],
         status: "deciding",
         coords: [-44.0044, 170.4777],
         mapsUrl: "https://maps.google.com/?q=Mackenzies+Bar+Grill+Lake+Tekapo"
@@ -520,6 +542,7 @@ const locations = [
         type: "Café",
         dish: "Flat white + cabinet food",
         vibe: "☕ Morning fuel before the Peninsula Walkway",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/1/18/Lake_Tekapo_and_lupins.jpg","https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg"],
         status: "deciding",
         coords: [-44.0022, 170.4801],
         mapsUrl: "https://maps.google.com/?q=Run+76+Cafe+Lake+Tekapo"
@@ -535,6 +558,7 @@ const locations = [
         type: "Iconic Mountain Hotel", price: "$$$",
         costNote: "~NZD $840–1,400/night", costDetail: "3 rooms for 6 pax",
         note: "THE Mt Cook hotel. Panoramic Aoraki views, been here since 1884. Book the mountain-view room.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/8/8d/The_Hermitage_hotel%2C_Mount_Cook%2C_New_Zealand_-_panoramio.jpg","https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg","https://upload.wikimedia.org/wikipedia/commons/0/08/LakePukakiNov232024_01.jpg"],
         status: "deciding",
         coords: [-43.7359, 170.0966],
         bookingUrl: "https://www.hermitage.co.nz/stay/hermitage-hotel/",
@@ -545,6 +569,7 @@ const locations = [
         type: "Cabins / Glamping", price: "$",
         costNote: "~NZD $200–400/night", costDetail: "2–3 cabins for 6 pax",
         note: "Campsites and self-contained cabins at the base of Aoraki. Budget pick with epic views.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg","https://upload.wikimedia.org/wikipedia/commons/0/08/LakePukakiNov232024_01.jpg"],
         status: "deciding",
         coords: [-43.8050, 170.1000],
         bookingUrl: "https://www.glentanner.co.nz/",
@@ -557,6 +582,7 @@ const locations = [
         type: "Café / Bar",
         dish: "Venison pie + Speight's Old Dark",
         vibe: "🏔️ Legendary. Alpine hikers fuel up here. Best views of Aoraki while you eat.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg","https://upload.wikimedia.org/wikipedia/commons/2/23/Stocking_Stream_Shelter_in_Hooker_Valley_in_front_of_Aoraki_Mount_Cook_Range.jpg"],
         status: "deciding",
         coords: [-43.7355, 170.0972],
         mapsUrl: "https://maps.google.com/?q=Old+Mountaineers+Cafe+Mt+Cook+Village"
@@ -566,6 +592,7 @@ const locations = [
         type: "Fine dining",
         dish: "Set degustation menu with mountain views",
         vibe: "✨ Splurge night — floor-to-ceiling windows facing Aoraki. Worth it once.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/8/8d/The_Hermitage_hotel%2C_Mount_Cook%2C_New_Zealand_-_panoramio.jpg","https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg"],
         status: "deciding",
         coords: [-43.7361, 170.0960],
         mapsUrl: "https://maps.google.com/?q=Panorama+Restaurant+Hermitage+Mt+Cook"
@@ -581,6 +608,7 @@ const locations = [
         type: "Vineyard Cottage", price: "$$$",
         costNote: "~NZD $1,200–1,800/night", costDetail: "3 cottages for 6 pax (2/cottage)",
         note: "Sleep in the vineyard. Wake up to rows of pinot noir. Cellar door 50m from your door.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/1/1c/Vineyard_in_Gibbston_Valley_in_South_Island%2C_New_Zealand_-_Central_Otago_wine_region.jpg","https://upload.wikimedia.org/wikipedia/commons/4/40/Peregrine_Winery%2C_Gibbston.jpg"],
         status: "deciding",
         coords: [-45.0120, 168.9450],
         bookingUrl: "https://kinross.nz/pages/vineyard-cottages",
@@ -591,6 +619,7 @@ const locations = [
         type: "Wine Estate Stay", price: "$$$",
         costNote: "~NZD $800–1,200/night", costDetail: "Private villa — contact direct",
         note: "Beautiful estate stay. One of NZ's best pinot producers. Book months in advance.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/4/40/Peregrine_Winery%2C_Gibbston.jpg","https://upload.wikimedia.org/wikipedia/commons/1/1c/Vineyard_in_Gibbston_Valley_in_South_Island%2C_New_Zealand_-_Central_Otago_wine_region.jpg"],
         status: "deciding",
         coords: [-44.9890, 168.8950],
         bookingUrl: "https://amisfield.co.nz/",
@@ -603,6 +632,7 @@ const locations = [
         type: "Farm-to-table fine dining",
         dish: "'Trust the chef' menu — no menu, all seasonal",
         vibe: "🌿 One of NZ's best restaurants. Seriously. Book ahead.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/4/40/Peregrine_Winery%2C_Gibbston.jpg","https://upload.wikimedia.org/wikipedia/commons/1/1c/Vineyard_in_Gibbston_Valley_in_South_Island%2C_New_Zealand_-_Central_Otago_wine_region.jpg"],
         status: "deciding",
         coords: [-44.9890, 168.8950],
         mapsUrl: "https://maps.google.com/?q=Amisfield+Bistro+Queenstown"
@@ -612,6 +642,7 @@ const locations = [
         type: "Cellar door tasting",
         dish: "Pinot Noir flight + cheese board",
         vibe: "🍷 Iconic NZ modernist architecture + award-winning wine",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/4/40/Peregrine_Winery%2C_Gibbston.jpg","https://upload.wikimedia.org/wikipedia/commons/5/5d/Central_Otago_wine_region.jpg"],
         status: "deciding",
         coords: [-45.0035, 168.9200],
         mapsUrl: "https://maps.google.com/?q=Peregrine+Wines+Gibbston+Valley"
@@ -621,6 +652,7 @@ const locations = [
         type: "Wine bar",
         dish: "Pinot Gris + shared plates",
         vibe: "🍇 Relaxed, unpretentious tasting right in the valley",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/1/1c/Vineyard_in_Gibbston_Valley_in_South_Island%2C_New_Zealand_-_Central_Otago_wine_region.jpg","https://upload.wikimedia.org/wikipedia/commons/5/5d/Central_Otago_wine_region.jpg"],
         status: "deciding",
         coords: [-45.0120, 168.9450],
         mapsUrl: "https://maps.google.com/?q=Kinross+Cellar+Door+Gibbston"
@@ -636,6 +668,7 @@ const locations = [
         type: "Design Hotel", price: "$$$",
         costNote: "~NZD $1,050–1,650/night", costDetail: "3 rooms for 6 pax",
         note: "Quirky, bold design hotel. Best rooftop bar views in QT. Right on the lakefront.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/2/29/Queenstown_at_night.jpg"],
         status: "deciding",
         coords: [-45.0302, 168.6598],
         bookingUrl: "https://www.qthotels.com/queenstown/",
@@ -646,6 +679,7 @@ const locations = [
         type: "Boutique Hotel", price: "$$$$",
         costNote: "~NZD $1,350–2,100/night", costDetail: "3 rooms for 6 pax",
         note: "Only 13 rooms. Converted 1920s dairy. Most personal hospitality in Queenstown.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/2/29/Queenstown_at_night.jpg","https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%288168013172%29.jpg"],
         status: "deciding",
         coords: [-45.0321, 168.6642],
         bookingUrl: "https://thedairy.co.nz/",
@@ -658,6 +692,7 @@ const locations = [
         type: "Legendary burger joint",
         dish: "The Ferg (double beef) — no modifications",
         vibe: "🍔 Non-negotiable. Queue is part of the experience. Open till 5am.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%288168013172%29.jpg","https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg"],
         status: "deciding",
         coords: [-45.0315, 168.6628],
         mapsUrl: "https://maps.google.com/?q=Fergburger+Queenstown"
@@ -667,6 +702,7 @@ const locations = [
         type: "Fine dining NZ",
         dish: "Venison + Central Otago pinot pairing",
         vibe: "✨ Josh Emett's restaurant. Serious food, serious wine list.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/2/29/Queenstown_at_night.jpg","https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg"],
         status: "deciding",
         coords: [-45.0308, 168.6601],
         mapsUrl: "https://maps.google.com/?q=Rata+Restaurant+Queenstown"
@@ -676,6 +712,7 @@ const locations = [
         type: "Steakhouse",
         dish: "Eye fillet with lake view",
         vibe: "🥩 Power dinner vibes. Lakefront terrace. Dress up slightly.",
+        photos: ["https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/c/c9/Queenstown_1_%288168013172%29.jpg"],
         status: "deciding",
         coords: [-45.0301, 168.6589],
         mapsUrl: "https://maps.google.com/?q=Botswana+Butchery+Queenstown"
@@ -698,6 +735,10 @@ function statusBadge(status) {
   return `<div class="status-badge ${s.cls}">${s.label}</div>`;
 }
 
+function carouselHTML(photos,alt){if(!photos||!photos.length)return"";const id="c"+Math.random().toString(36).slice(2,7);if(photos.length===1)return`<div class="card-carousel" id="${id}"><div class="carousel-track"><div class="carousel-slide"><img src="${photos[0]}" alt="${alt}" loading="lazy"/></div></div></div>`;const slides=photos.map(p=>`<div class="carousel-slide"><img src="${p}" alt="${alt}" loading="lazy"/></div>`).join("");const dots=photos.map((_,i)=>`<button class="carousel-dot${i===0?" active":""}" data-c="${id}" data-i="${i}"></button>`).join("");return`<div class="card-carousel" id="${id}"><div class="carousel-track">${slides}</div><div class="carousel-dots">${dots}</div><button class="carousel-arrow prev" data-c="${id}">&#x2039;</button><button class="carousel-arrow next" data-c="${id}">&#x203a;</button></div>`;}
+const _cs={};
+function initCarousels(){document.querySelectorAll(".card-carousel").forEach(el=>{const id=el.id;if(!id||_cs[id])return;const track=el.querySelector(".carousel-track");if(!track)return;const total=track.children.length;if(total<=1)return;_cs[id]={cur:0,total};function go(idx){const s=_cs[id];s.cur=(idx+s.total)%s.total;track.style.transform=`translateX(-${s.cur*100}%)`;el.querySelectorAll(".carousel-dot").forEach((d,i)=>d.classList.toggle("active",i===s.cur));}el.querySelectorAll(".carousel-arrow.prev").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();go(_cs[id].cur-1);}));el.querySelectorAll(".carousel-arrow.next").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();go(_cs[id].cur+1);}));el.querySelectorAll(".carousel-dot").forEach((d,i)=>d.addEventListener("click",e=>{e.stopPropagation();go(i);}));let tx=0;el.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});el.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>40)go(_cs[id].cur+(dx<0?1:-1));},{passive:true});});}
+
 // ═══════════════════════════════════════
 // MAP SETUP
 // ═══════════════════════════════════════
@@ -712,8 +753,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // Layer groups
 const itineraryLayer = L.layerGroup().addTo(map);
-const lodgingLayer = L.layerGroup();
-const diningLayer = L.layerGroup();
+const lodgingLayer = L.layerGroup().addTo(map);
+const diningLayer = L.layerGroup().addTo(map);
 
 // ── REAL DRIVING ROUTES via OSRM ──
 const driveSegments = [
@@ -784,7 +825,7 @@ days.forEach((day, idx) => {
   const offset = (groupIdx - (group.length-1)/2) * 0.008;
   const coords = [day.coords[0]+offset, day.coords[1]];
 
-  const photoHTML = day.photo ? `<div class="popup-photo-wrap"><img src="${day.photo}" alt="${day.location}" loading="lazy"/><div class="popup-meme-overlay">${day.meme}</div></div>` : '';
+  const photoHTML = day.photos&&day.photos[0] ? `<div class="popup-photo-wrap"><img src="${day.photos[0]}" alt="${day.location}" loading="lazy"/><div class="popup-meme-overlay">${day.meme}</div></div>` : '';
   const driveHTML = day.drive ? `<div class="drive-badge">🚗 ${day.drive}</div>` : '';
   const stayHTML = day.stay ? `<div class="popup-footer">🏠 ${day.stay}</div>` : '';
   const popup = `<div class="popup-inner" style="--popup-color:${day.color}">${photoHTML}<div class="popup-badge">${day.label} · ${day.date}</div><div class="popup-title">📍 ${day.location}</div>${driveHTML}<ul class="popup-items">${day.activities.map(a=>`<li>${a}</li>`).join('')}</ul>${stayHTML}</div>`;
@@ -837,6 +878,7 @@ function renderItinerary() {
     card.id = `day-card-${day.id}`;
     card.style.setProperty('--day-color', day.color);
     card.innerHTML = `
+      ${carouselHTML(day.photos, day.location)}
       <div class="day-header">
         <div class="day-badge">${day.id}</div>
         <div class="day-meta">
@@ -859,6 +901,7 @@ function renderItinerary() {
     });
     content.appendChild(card);
   });
+  setTimeout(initCarousels,0);
 }
 
 function renderLodging() {
@@ -878,6 +921,7 @@ function renderLodging() {
       </div>
       ${loc.lodging.map((l, i) => `
         <div class="lodging-card${l.status === 'booked' ? ' is-booked' : ''}" id="lodging-${loc.id}-${i}">
+          ${carouselHTML(l.photos,l.name)}
           ${statusBadge(l.status)}
           <div class="lodging-name">${l.name}</div>
           <div class="lodging-meta">
@@ -898,6 +942,7 @@ function renderLodging() {
     `;
     content.appendChild(group);
   });
+  setTimeout(initCarousels,0);
 }
 
 function renderDining() {
@@ -917,6 +962,7 @@ function renderDining() {
       </div>
       ${loc.dining.map((d, i) => `
         <div class="dining-card${d.status === 'booked' ? ' is-booked' : ''}" id="dining-${loc.id}-${i}">
+          ${carouselHTML(d.photos,d.name)}
           ${statusBadge(d.status)}
           <div class="dining-name">${d.name}</div>
           <div class="dining-meta">
@@ -932,6 +978,7 @@ function renderDining() {
     `;
     content.appendChild(group);
   });
+  setTimeout(initCarousels,0);
 }
 
 // ═══════════════════════════════════════
@@ -946,16 +993,6 @@ function switchTab(tab) {
     btn.classList.remove('active');
     if (btn.dataset.tab === tab) btn.classList.add('active');
   });
-  if (tab === 'itinerary') {
-    map.addLayer(itineraryLayer); map.removeLayer(lodgingLayer); map.removeLayer(diningLayer);
-    legendEl.style.display = 'block';
-  } else if (tab === 'lodging') {
-    map.removeLayer(itineraryLayer); map.addLayer(lodgingLayer); map.removeLayer(diningLayer);
-    legendEl.style.display = 'none';
-  } else if (tab === 'dining') {
-    map.removeLayer(itineraryLayer); map.removeLayer(lodgingLayer); map.addLayer(diningLayer);
-    legendEl.style.display = 'none';
-  }
   if (tab === 'itinerary') renderItinerary();
   else if (tab === 'lodging') renderLodging();
   else if (tab === 'dining') renderDining();
@@ -972,23 +1009,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // ═══════════════════════════════════════
-// LEGEND
-// ═══════════════════════════════════════
-
-const legendEl = document.createElement('div');
-legendEl.className = 'legend';
-legendEl.innerHTML = `
-  <div class="legend-title">🛣️ Driving Route</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> D2 · CHC → Tekapo (3 hrs)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div> D4 · Tekapo → Mt Cook (1.5 hrs)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#bc8cff"></div> D6 · Mt Cook → Gibbston (2.5 hrs)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#ff7b72"></div> D7 · Gibbston → QT (~1 hr)</div>
-  <div class="legend-item" style="margin-top:8px;font-size:10px;color:#8b949e;">Tap any marker for details</div>
-`;
-document.body.appendChild(legendEl);
-legendEl.style.cssText = 'position:fixed;bottom:70px;right:12px;z-index:1000;';
-
-// ═══════════════════════════════════════
 // MOBILE SHEET
 // ═══════════════════════════════════════
 
@@ -1000,13 +1020,11 @@ function isMobile() { return window.innerWidth <= 640; }
 
 function collapseSheet() {
   sidebar.classList.remove('open');
-  legendEl.style.bottom = '70px';
 }
 
 handle.addEventListener('click', () => {
   if (!isMobile()) return;
   sidebar.classList.toggle('open');
-  legendEl.style.bottom = sidebar.classList.contains('open') ? '76dvh' : '70px';
 });
 
 map.on('click', () => {
