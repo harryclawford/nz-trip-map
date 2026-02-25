@@ -630,17 +630,84 @@ const itineraryLayer = L.layerGroup().addTo(map);
 const lodgingLayer = L.layerGroup();
 const diningLayer = L.layerGroup();
 
-// Route lines
-const routeCoords = [[-43.5321,172.6362],[-44.0038,170.4786],[-43.7359,170.0966],[-45.0132,168.9481],[-45.0312,168.6626]];
-L.polyline(routeCoords, { color: '#58a6ff', weight: 2.5, opacity: 0.6, dashArray: '8,6' }).addTo(map);
+// ── REAL DRIVING ROUTES via OSRM ──
+// OSRM uses lon,lat order
+const driveSegments = [
+  {
+    label: "D2 · Christchurch → Tekapo",
+    color: "#3fb950",
+    weight: 4,
+    waypoints: [
+      [172.6362, -43.5321], // Christchurch
+      [170.4786, -44.0038]  // Lake Tekapo
+    ]
+  },
+  {
+    label: "D4 · Tekapo → Mt Cook",
+    color: "#f0883e",
+    weight: 4,
+    waypoints: [
+      [170.4786, -44.0038], // Lake Tekapo
+      [170.0966, -43.7359]  // Mt Cook
+    ]
+  },
+  {
+    label: "D6 · Mt Cook → Gibbston",
+    color: "#bc8cff",
+    weight: 4,
+    waypoints: [
+      [170.0966, -43.7359], // Mt Cook
+      [168.9481, -45.0132]  // Gibbston Valley
+    ]
+  },
+  {
+    label: "D7 · Gibbston → Queenstown",
+    color: "#ff7b72",
+    weight: 4,
+    waypoints: [
+      [168.9481, -45.0132], // Gibbston Valley
+      [168.6626, -45.0312]  // Queenstown
+    ]
+  }
+];
 
-const d2Path = [[-43.5321,172.6362],[-43.9036,171.7280],[-43.6276,171.6497],[-43.5800,171.4200],[-44.0978,171.2366],[-44.1022,170.8290],[-44.0038,170.4786]];
-L.polyline(d2Path, { color: '#3fb950', weight: 1.5, opacity: 0.35, dashArray: '4,5' }).addTo(map);
+async function fetchRoute(waypoints) {
+  const coords = waypoints.map(w => w.join(',')).join(';');
+  const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
+  const res = await fetch(url);
+  const data = await res.json();
+  if (data.routes && data.routes[0]) {
+    return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]); // flip to lat,lon for Leaflet
+  }
+  return null;
+}
 
-const d4Path = [[-44.0038,170.4786],[-44.1772,170.1667],[-43.7359,170.0966]];
-L.polyline(d4Path, { color: '#f0883e', weight: 1.5, opacity: 0.35, dashArray: '4,5' }).addTo(map);
+// Loading indicator
+const routeStatus = document.createElement('div');
+routeStatus.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(22,27,34,0.9);border:1px solid #30363d;border-radius:20px;padding:6px 14px;font-size:11px;color:#8b949e;z-index:999;transition:opacity 0.3s;';
+routeStatus.textContent = '🛣️ Loading driving routes...';
+document.body.appendChild(routeStatus);
 
-// Pit stops
+Promise.all(driveSegments.map(async seg => {
+  const coords = await fetchRoute(seg.waypoints);
+  if (coords) {
+    L.polyline(coords, {
+      color: seg.color,
+      weight: seg.weight,
+      opacity: 0.75,
+      lineJoin: 'round',
+      lineCap: 'round'
+    }).bindTooltip(seg.label, { sticky: true, className: 'route-label' }).addTo(map);
+  }
+})).then(() => {
+  routeStatus.style.opacity = '0';
+  setTimeout(() => routeStatus.remove(), 400);
+}).catch(() => {
+  routeStatus.textContent = '⚠️ Route load failed';
+  setTimeout(() => routeStatus.remove(), 3000);
+});
+
+// Pit stops (kept as reference markers)
 [{ name:"Ashburton", coords:[-43.9036,171.7280]},{ name:"Methven", coords:[-43.6276,171.6497]},{ name:"Rakaia Gorge", coords:[-43.5800,171.4200]},{ name:"Geraldine", coords:[-44.0978,171.2366]},{ name:"Fairlie", coords:[-44.1022,170.8290]},{ name:"Lake Pukaki", coords:[-44.1772,170.1667]}].forEach(s => {
   L.marker(s.coords, { icon: L.divIcon({ className:'', html:`<div style="width:8px;height:8px;border-radius:50%;background:#3fb950;border:1.5px solid rgba(255,255,255,0.4);opacity:0.7;"></div>`, iconSize:[8,8], iconAnchor:[4,4] })}).bindTooltip(s.name, { direction:'top', offset:[0,-6], className:'route-label' }).addTo(map);
 });
@@ -877,10 +944,11 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 const legendEl = document.createElement('div');
 legendEl.className = 'legend';
 legendEl.innerHTML = `
-  <div class="legend-title">Route</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> Main route</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> D2 drive stops</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div> Lake Pukaki stop</div>
+  <div class="legend-title">🛣️ Driving Route</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> D2 · CHC → Tekapo (3 hrs)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div> D4 · Tekapo → Mt Cook (1.5 hrs)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#bc8cff"></div> D6 · Mt Cook → Gibbston (2.5 hrs)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ff7b72"></div> D7 · Gibbston → QT (~1 hr)</div>
   <div class="legend-item" style="margin-top:8px;font-size:10px;color:#8b949e;">Tap any marker for details</div>
 `;
 document.body.appendChild(legendEl);
