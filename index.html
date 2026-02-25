@@ -103,6 +103,28 @@ header {
   color: #8b949e; text-transform: uppercase; letter-spacing: 1px;
   border-bottom: 1px solid #21262d; background: #0d1117;
   position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-header .updated-tag {
+  font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0;
+  color: #484f58; background: rgba(255,255,255,0.04); border: 1px solid #21262d;
+  border-radius: 8px; padding: 2px 8px;
+}
+
+/* ══ STATUS BADGES ══ */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 10px; padding: 3px 10px; font-size: 12px; font-weight: 600;
+  margin-bottom: 8px;
+}
+.status-badge.booked {
+  background: rgba(63,185,80,0.14); border: 1px solid rgba(63,185,80,0.35); color: #3fb950;
+}
+.status-badge.deciding {
+  background: rgba(227,179,65,0.10); border: 1px solid rgba(227,179,65,0.28); color: #e3b341;
+}
+.status-badge.backup {
+  background: rgba(139,148,158,0.08); border: 1px solid rgba(139,148,158,0.20); color: #6e7681;
 }
 
 /* ══ DAY CARDS (Itinerary) ══ */
@@ -156,6 +178,7 @@ header {
 }
 .lodging-card:first-of-type { margin-top: 12px; }
 .lodging-card:hover { border-color: #3fb950; }
+.lodging-card.is-booked { border-color: rgba(63,185,80,0.4); }
 .lodging-name { font-size: 15px; font-weight: 600; color: #e6edf3; margin-bottom: 5px; }
 .lodging-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .lodging-type {
@@ -181,6 +204,7 @@ header {
 }
 .dining-card:first-of-type { margin-top: 12px; }
 .dining-card:hover { border-color: #f0883e; }
+.dining-card.is-booked { border-color: rgba(240,136,62,0.4); }
 .dining-name { font-size: 15px; font-weight: 600; color: #e6edf3; margin-bottom: 5px; }
 .dining-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
 .dining-type {
@@ -276,7 +300,7 @@ header {
   </div>
   <div class="header-stats">
     <div class="stat"><div class="val">9</div><div class="lbl">Days</div></div>
-    <div class="stat"><div class="val">5</div><div class="lbl">Places</div></div>
+    <div class="stat"><div class="val">6</div><div class="lbl">Pax</div></div>
     <div class="stat"><div class="val">Apr 25</div><div class="lbl">Depart</div></div>
     <div class="stat"><div class="val">May 3</div><div class="lbl">Return</div></div>
   </div>
@@ -296,6 +320,12 @@ header {
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+
+// ═══════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════
+
+const LAST_UPDATED = "Feb 25, 2026";
 
 // ═══════════════════════════════════════
 // DATA
@@ -395,6 +425,7 @@ const locations = [
         type: "Boutique Hotel", price: "$$$",
         costNote: "~NZD $1,050–1,500/night", costDetail: "3 rooms for 6 pax",
         note: "Best address in Christchurch. Parkside location, impeccable service, beautiful rooms.",
+        status: "deciding",
         coords: [-43.5274, 172.6417],
         bookingUrl: "https://www.thegeorge.com/",
         mapsUrl: "https://maps.google.com/?q=The+George+Hotel+Christchurch"
@@ -404,6 +435,7 @@ const locations = [
         type: "Heritage B&B", price: "$$",
         costNote: "~NZD $450–700/night", costDetail: "3 rooms for 6 pax",
         note: "Victorian mansion, 10 min walk to city centre. Elegant, personal, great breakfast.",
+        status: "deciding",
         coords: [-43.5315, 172.6381],
         bookingUrl: "https://www.booking.com/hotel/nz/elizas-manor.html",
         mapsUrl: "https://maps.google.com/?q=Elizas+Manor+Christchurch"
@@ -415,6 +447,7 @@ const locations = [
         type: "All-day brunch café",
         dish: "Smashed avo toast + cold brew",
         vibe: "☀️ Best brunch spot in CHC — lively, packed on weekends",
+        status: "deciding",
         coords: [-43.5292, 172.6368],
         mapsUrl: "https://maps.google.com/?q=Hello+Sunday+Christchurch+NZ"
       },
@@ -423,6 +456,7 @@ const locations = [
         type: "Wine bar / restaurant",
         dish: "Local pinot noir + shared boards",
         vibe: "🍷 Sophisticated but relaxed — perfect first-night dinner",
+        status: "deciding",
         coords: [-43.5301, 172.6352],
         mapsUrl: "https://maps.google.com/?q=Fiddlesticks+Christchurch+NZ"
       },
@@ -431,6 +465,7 @@ const locations = [
         type: "Gastropub",
         dish: "Burger + whatever's on tap",
         vibe: "🍺 Chill spot if you just want to decompress after the flight",
+        status: "deciding",
         coords: [-43.5310, 172.6340],
         mapsUrl: "https://maps.google.com/?q=The+Pog+Christchurch+NZ"
       }
@@ -445,6 +480,7 @@ const locations = [
         type: "Lakefront Resort", price: "$$$",
         costNote: "~NZD $550–800/night", costDetail: "1× 3-bedroom apartment fits 6",
         note: "Right on the lakefront. Stunning turquoise views, spa, outdoor hot pools. The one.",
+        status: "deciding",
         coords: [-44.0042, 170.4751],
         bookingUrl: "https://www.peppers.co.nz/bluewater/",
         mapsUrl: "https://maps.google.com/?q=Peppers+Bluewater+Resort+Lake+Tekapo"
@@ -454,6 +490,7 @@ const locations = [
         type: "Hostel / B&B", price: "$",
         costNote: "~NZD $280–420/night", costDetail: "3 rooms for 6 pax",
         note: "Small, cozy, hosts are legends. Private hot tub with direct lake views. Feels like home.",
+        status: "deciding",
         coords: [-44.0058, 170.4802],
         bookingUrl: "https://www.tekapohostelnz.com/",
         mapsUrl: "https://maps.google.com/?q=Tailor+Made+Tekapo+Accommodation"
@@ -465,6 +502,7 @@ const locations = [
         type: "Japanese",
         dish: "Salmon sashimi (local Mt Cook salmon — seriously)",
         vibe: "🍣 Surprisingly legit Japanese in the middle of NZ's south island",
+        status: "deciding",
         coords: [-44.0031, 170.4789],
         mapsUrl: "https://maps.google.com/?q=Kohan+Restaurant+Lake+Tekapo"
       },
@@ -473,6 +511,7 @@ const locations = [
         type: "NZ Classic",
         dish: "Lamb rack + Mackenzie Basin pinot",
         vibe: "🥩 Classic NZ cooking, solid every time, lake views",
+        status: "deciding",
         coords: [-44.0044, 170.4777],
         mapsUrl: "https://maps.google.com/?q=Mackenzies+Bar+Grill+Lake+Tekapo"
       },
@@ -481,6 +520,7 @@ const locations = [
         type: "Café",
         dish: "Flat white + cabinet food",
         vibe: "☕ Morning fuel before the Peninsula Walkway",
+        status: "deciding",
         coords: [-44.0022, 170.4801],
         mapsUrl: "https://maps.google.com/?q=Run+76+Cafe+Lake+Tekapo"
       }
@@ -495,6 +535,7 @@ const locations = [
         type: "Iconic Mountain Hotel", price: "$$$",
         costNote: "~NZD $840–1,400/night", costDetail: "3 rooms for 6 pax",
         note: "THE Mt Cook hotel. Panoramic Aoraki views, been here since 1884. Book the mountain-view room.",
+        status: "deciding",
         coords: [-43.7359, 170.0966],
         bookingUrl: "https://www.hermitage.co.nz/stay/hermitage-hotel/",
         mapsUrl: "https://maps.google.com/?q=The+Hermitage+Hotel+Mt+Cook"
@@ -504,6 +545,7 @@ const locations = [
         type: "Cabins / Glamping", price: "$",
         costNote: "~NZD $200–400/night", costDetail: "2–3 cabins for 6 pax",
         note: "Campsites and self-contained cabins at the base of Aoraki. Budget pick with epic views.",
+        status: "deciding",
         coords: [-43.8050, 170.1000],
         bookingUrl: "https://www.glentanner.co.nz/",
         mapsUrl: "https://maps.google.com/?q=Glentanner+Park+Centre+Mt+Cook"
@@ -515,6 +557,7 @@ const locations = [
         type: "Café / Bar",
         dish: "Venison pie + Speight's Old Dark",
         vibe: "🏔️ Legendary. Alpine hikers fuel up here. Best views of Aoraki while you eat.",
+        status: "deciding",
         coords: [-43.7355, 170.0972],
         mapsUrl: "https://maps.google.com/?q=Old+Mountaineers+Cafe+Mt+Cook+Village"
       },
@@ -523,6 +566,7 @@ const locations = [
         type: "Fine dining",
         dish: "Set degustation menu with mountain views",
         vibe: "✨ Splurge night — floor-to-ceiling windows facing Aoraki. Worth it once.",
+        status: "deciding",
         coords: [-43.7361, 170.0960],
         mapsUrl: "https://maps.google.com/?q=Panorama+Restaurant+Hermitage+Mt+Cook"
       }
@@ -537,6 +581,7 @@ const locations = [
         type: "Vineyard Cottage", price: "$$$",
         costNote: "~NZD $1,200–1,800/night", costDetail: "3 cottages for 6 pax (2/cottage)",
         note: "Sleep in the vineyard. Wake up to rows of pinot noir. Cellar door 50m from your door.",
+        status: "deciding",
         coords: [-45.0120, 168.9450],
         bookingUrl: "https://kinross.nz/pages/vineyard-cottages",
         mapsUrl: "https://maps.google.com/?q=Kinross+Gibbston+Valley+Queenstown"
@@ -546,6 +591,7 @@ const locations = [
         type: "Wine Estate Stay", price: "$$$",
         costNote: "~NZD $800–1,200/night", costDetail: "Private villa — contact direct",
         note: "Beautiful estate stay. One of NZ's best pinot producers. Book months in advance.",
+        status: "deciding",
         coords: [-44.9890, 168.8950],
         bookingUrl: "https://amisfield.co.nz/",
         mapsUrl: "https://maps.google.com/?q=Amisfield+Winery+Queenstown"
@@ -557,6 +603,7 @@ const locations = [
         type: "Farm-to-table fine dining",
         dish: "'Trust the chef' menu — no menu, all seasonal",
         vibe: "🌿 One of NZ's best restaurants. Seriously. Book ahead.",
+        status: "deciding",
         coords: [-44.9890, 168.8950],
         mapsUrl: "https://maps.google.com/?q=Amisfield+Bistro+Queenstown"
       },
@@ -565,6 +612,7 @@ const locations = [
         type: "Cellar door tasting",
         dish: "Pinot Noir flight + cheese board",
         vibe: "🍷 Iconic NZ modernist architecture + award-winning wine",
+        status: "deciding",
         coords: [-45.0035, 168.9200],
         mapsUrl: "https://maps.google.com/?q=Peregrine+Wines+Gibbston+Valley"
       },
@@ -573,6 +621,7 @@ const locations = [
         type: "Wine bar",
         dish: "Pinot Gris + shared plates",
         vibe: "🍇 Relaxed, unpretentious tasting right in the valley",
+        status: "deciding",
         coords: [-45.0120, 168.9450],
         mapsUrl: "https://maps.google.com/?q=Kinross+Cellar+Door+Gibbston"
       }
@@ -587,6 +636,7 @@ const locations = [
         type: "Design Hotel", price: "$$$",
         costNote: "~NZD $1,050–1,650/night", costDetail: "3 rooms for 6 pax",
         note: "Quirky, bold design hotel. Best rooftop bar views in QT. Right on the lakefront.",
+        status: "deciding",
         coords: [-45.0302, 168.6598],
         bookingUrl: "https://www.qthotels.com/queenstown/",
         mapsUrl: "https://maps.google.com/?q=QT+Hotel+Queenstown+New+Zealand"
@@ -596,6 +646,7 @@ const locations = [
         type: "Boutique Hotel", price: "$$$$",
         costNote: "~NZD $1,350–2,100/night", costDetail: "3 rooms for 6 pax",
         note: "Only 13 rooms. Converted 1920s dairy. Most personal hospitality in Queenstown.",
+        status: "deciding",
         coords: [-45.0321, 168.6642],
         bookingUrl: "https://thedairy.co.nz/",
         mapsUrl: "https://maps.google.com/?q=The+Dairy+Private+Hotel+Queenstown"
@@ -607,6 +658,7 @@ const locations = [
         type: "Legendary burger joint",
         dish: "The Ferg (double beef) — no modifications",
         vibe: "🍔 Non-negotiable. Queue is part of the experience. Open till 5am.",
+        status: "deciding",
         coords: [-45.0315, 168.6628],
         mapsUrl: "https://maps.google.com/?q=Fergburger+Queenstown"
       },
@@ -615,6 +667,7 @@ const locations = [
         type: "Fine dining NZ",
         dish: "Venison + Central Otago pinot pairing",
         vibe: "✨ Josh Emett's restaurant. Serious food, serious wine list.",
+        status: "deciding",
         coords: [-45.0308, 168.6601],
         mapsUrl: "https://maps.google.com/?q=Rata+Restaurant+Queenstown"
       },
@@ -623,12 +676,27 @@ const locations = [
         type: "Steakhouse",
         dish: "Eye fillet with lake view",
         vibe: "🥩 Power dinner vibes. Lakefront terrace. Dress up slightly.",
+        status: "deciding",
         coords: [-45.0301, 168.6589],
         mapsUrl: "https://maps.google.com/?q=Botswana+Butchery+Queenstown"
       }
     ]
   }
 ];
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+
+function statusBadge(status) {
+  const map = {
+    booked:   { cls: 'booked',   label: '✅ Booked' },
+    deciding: { cls: 'deciding', label: '🗳️ Deciding' },
+    backup:   { cls: 'backup',   label: '· Backup' }
+  };
+  const s = map[status] || map.deciding;
+  return `<div class="status-badge ${s.cls}">${s.label}</div>`;
+}
 
 // ═══════════════════════════════════════
 // MAP SETUP
@@ -648,44 +716,11 @@ const lodgingLayer = L.layerGroup();
 const diningLayer = L.layerGroup();
 
 // ── REAL DRIVING ROUTES via OSRM ──
-// OSRM uses lon,lat order
 const driveSegments = [
-  {
-    label: "D2 · Christchurch → Tekapo",
-    color: "#3fb950",
-    weight: 4,
-    waypoints: [
-      [172.6362, -43.5321], // Christchurch
-      [170.4786, -44.0038]  // Lake Tekapo
-    ]
-  },
-  {
-    label: "D4 · Tekapo → Mt Cook",
-    color: "#f0883e",
-    weight: 4,
-    waypoints: [
-      [170.4786, -44.0038], // Lake Tekapo
-      [170.0966, -43.7359]  // Mt Cook
-    ]
-  },
-  {
-    label: "D6 · Mt Cook → Gibbston",
-    color: "#bc8cff",
-    weight: 4,
-    waypoints: [
-      [170.0966, -43.7359], // Mt Cook
-      [168.9481, -45.0132]  // Gibbston Valley
-    ]
-  },
-  {
-    label: "D7 · Gibbston → Queenstown",
-    color: "#ff7b72",
-    weight: 4,
-    waypoints: [
-      [168.9481, -45.0132], // Gibbston Valley
-      [168.6626, -45.0312]  // Queenstown
-    ]
-  }
+  { label: "D2 · Christchurch → Tekapo", color: "#3fb950", weight: 4, waypoints: [[172.6362,-43.5321],[170.4786,-44.0038]] },
+  { label: "D4 · Tekapo → Mt Cook",       color: "#f0883e", weight: 4, waypoints: [[170.4786,-44.0038],[170.0966,-43.7359]] },
+  { label: "D6 · Mt Cook → Gibbston",     color: "#bc8cff", weight: 4, waypoints: [[170.0966,-43.7359],[168.9481,-45.0132]] },
+  { label: "D7 · Gibbston → Queenstown",  color: "#ff7b72", weight: 4, waypoints: [[168.9481,-45.0132],[168.6626,-45.0312]] }
 ];
 
 async function fetchRoute(waypoints) {
@@ -694,12 +729,11 @@ async function fetchRoute(waypoints) {
   const res = await fetch(url);
   const data = await res.json();
   if (data.routes && data.routes[0]) {
-    return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]); // flip to lat,lon for Leaflet
+    return data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
   }
   return null;
 }
 
-// Loading indicator
 const routeStatus = document.createElement('div');
 routeStatus.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(22,27,34,0.9);border:1px solid #30363d;border-radius:20px;padding:6px 14px;font-size:11px;color:#8b949e;z-index:999;transition:opacity 0.3s;';
 routeStatus.textContent = '🛣️ Loading driving routes...';
@@ -708,13 +742,8 @@ document.body.appendChild(routeStatus);
 Promise.all(driveSegments.map(async seg => {
   const coords = await fetchRoute(seg.waypoints);
   if (coords) {
-    L.polyline(coords, {
-      color: seg.color,
-      weight: seg.weight,
-      opacity: 0.75,
-      lineJoin: 'round',
-      lineCap: 'round'
-    }).bindTooltip(seg.label, { sticky: true, className: 'route-label' }).addTo(map);
+    L.polyline(coords, { color: seg.color, weight: seg.weight, opacity: 0.75, lineJoin: 'round', lineCap: 'round' })
+      .bindTooltip(seg.label, { sticky: true, className: 'route-label' }).addTo(map);
   }
 })).then(() => {
   routeStatus.style.opacity = '0';
@@ -724,12 +753,10 @@ Promise.all(driveSegments.map(async seg => {
   setTimeout(() => routeStatus.remove(), 3000);
 });
 
-// Pit stops (kept as reference markers)
 [{ name:"Ashburton", coords:[-43.9036,171.7280]},{ name:"Methven", coords:[-43.6276,171.6497]},{ name:"Rakaia Gorge", coords:[-43.5800,171.4200]},{ name:"Geraldine", coords:[-44.0978,171.2366]},{ name:"Fairlie", coords:[-44.1022,170.8290]},{ name:"Lake Pukaki", coords:[-44.1772,170.1667]}].forEach(s => {
   L.marker(s.coords, { icon: L.divIcon({ className:'', html:`<div style="width:8px;height:8px;border-radius:50%;background:#3fb950;border:1.5px solid rgba(255,255,255,0.4);opacity:0.7;"></div>`, iconSize:[8,8], iconAnchor:[4,4] })}).bindTooltip(s.name, { direction:'top', offset:[0,-6], className:'route-label' }).addTo(map);
 });
 
-// Location labels
 [{ name:"Christchurch", coords:[-43.5321,172.6362]},{ name:"Lake Tekapo", coords:[-44.0038,170.4786]},{ name:"Aoraki / Mt Cook", coords:[-43.7359,170.0966]},{ name:"Gibbston Valley", coords:[-45.0132,168.9481]},{ name:"Queenstown", coords:[-45.0312,168.6626]}].forEach(l => {
   L.marker(l.coords, { icon: L.divIcon({ className:'', html:`<div style="background:rgba(22,27,34,0.8);border:1px solid #30363d;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#c9d1d9;white-space:nowrap;margin-top:28px;margin-left:-40px;">${l.name}</div>`, iconSize:[0,0] })}).addTo(map);
 });
@@ -760,7 +787,6 @@ days.forEach((day, idx) => {
   const photoHTML = day.photo ? `<div class="popup-photo-wrap"><img src="${day.photo}" alt="${day.location}" loading="lazy"/><div class="popup-meme-overlay">${day.meme}</div></div>` : '';
   const driveHTML = day.drive ? `<div class="drive-badge">🚗 ${day.drive}</div>` : '';
   const stayHTML = day.stay ? `<div class="popup-footer">🏠 ${day.stay}</div>` : '';
-
   const popup = `<div class="popup-inner" style="--popup-color:${day.color}">${photoHTML}<div class="popup-badge">${day.label} · ${day.date}</div><div class="popup-title">📍 ${day.location}</div>${driveHTML}<ul class="popup-items">${day.activities.map(a=>`<li>${a}</li>`).join('')}</ul>${stayHTML}</div>`;
 
   const marker = L.marker(coords, { icon }).bindPopup(popup, { maxWidth:300 }).addTo(itineraryLayer);
@@ -838,7 +864,7 @@ function renderItinerary() {
 
 function renderLodging() {
   const content = document.getElementById('tab-content');
-  content.innerHTML = '';
+  content.innerHTML = `<div class="section-header"><span>🏠 Accommodation Options</span><span class="updated-tag">Updated ${LAST_UPDATED}</span></div>`;
   locations.forEach(loc => {
     const group = document.createElement('div');
     group.className = 'location-group';
@@ -852,7 +878,8 @@ function renderLodging() {
         </div>
       </div>
       ${loc.lodging.map((l, i) => `
-        <div class="lodging-card" id="lodging-${loc.id}-${i}">
+        <div class="lodging-card${l.status === 'booked' ? ' is-booked' : ''}" id="lodging-${loc.id}-${i}">
+          ${statusBadge(l.status)}
           <div class="lodging-name">${l.name}</div>
           <div class="lodging-meta">
             <span class="lodging-type">${l.type}</span>
@@ -876,7 +903,7 @@ function renderLodging() {
 
 function renderDining() {
   const content = document.getElementById('tab-content');
-  content.innerHTML = '';
+  content.innerHTML = `<div class="section-header"><span>🍽️ Dining Options</span><span class="updated-tag">Updated ${LAST_UPDATED}</span></div>`;
   locations.forEach(loc => {
     const group = document.createElement('div');
     group.className = 'location-group';
@@ -890,7 +917,8 @@ function renderDining() {
         </div>
       </div>
       ${loc.dining.map((d, i) => `
-        <div class="dining-card" id="dining-${loc.id}-${i}">
+        <div class="dining-card${d.status === 'booked' ? ' is-booked' : ''}" id="dining-${loc.id}-${i}">
+          ${statusBadge(d.status)}
           <div class="dining-name">${d.name}</div>
           <div class="dining-meta">
             <span class="dining-type">${d.type}</span>
@@ -907,16 +935,6 @@ function renderDining() {
   });
 }
 
-function focusLodging(locCoords, coords) {
-  map.flyTo(coords, 14, { duration: 1.2 });
-  if (isMobile()) collapseSheet();
-}
-
-function focusDining(locCoords, coords) {
-  map.flyTo(coords, 14, { duration: 1.2 });
-  if (isMobile()) collapseSheet();
-}
-
 // ═══════════════════════════════════════
 // TAB SWITCHING
 // ═══════════════════════════════════════
@@ -925,12 +943,10 @@ let activeTab = 'itinerary';
 
 function switchTab(tab) {
   activeTab = tab;
-  // Update tab button styles
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.tab === tab) btn.classList.add('active');
   });
-  // Swap map layers
   if (tab === 'itinerary') {
     map.addLayer(itineraryLayer); map.removeLayer(lodgingLayer); map.removeLayer(diningLayer);
     legendEl.style.display = 'block';
@@ -941,7 +957,6 @@ function switchTab(tab) {
     map.removeLayer(itineraryLayer); map.removeLayer(lodgingLayer); map.addLayer(diningLayer);
     legendEl.style.display = 'none';
   }
-  // Render content
   if (tab === 'itinerary') renderItinerary();
   else if (tab === 'lodging') renderLodging();
   else if (tab === 'dining') renderDining();
@@ -951,7 +966,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     switchTab(btn.dataset.tab);
-    // Auto-expand on mobile
     if (isMobile() && !sidebar.classList.contains('open')) {
       sidebar.classList.add('open');
     }
@@ -1003,7 +1017,6 @@ map.on('click', () => {
 // Init
 renderItinerary();
 
-// Fix Leaflet tile rendering after layout settles
 setTimeout(() => map.invalidateSize(), 100);
 window.addEventListener('resize', () => map.invalidateSize());
 
