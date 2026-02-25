@@ -14,6 +14,7 @@
     background: #0d1117;
     color: #e6edf3;
     height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -23,7 +24,7 @@
   header {
     background: linear-gradient(135deg, #161b22 0%, #1a2332 100%);
     border-bottom: 1px solid #30363d;
-    padding: 14px 24px;
+    padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -34,56 +35,49 @@
   .header-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
   }
 
-  .nz-flag {
-    font-size: 24px;
-  }
+  .nz-flag { font-size: 22px; }
 
   .header-title h1 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     color: #58a6ff;
     letter-spacing: -0.3px;
   }
 
   .header-title p {
-    font-size: 12px;
+    font-size: 11px;
     color: #8b949e;
     margin-top: 1px;
   }
 
   .header-stats {
     display: flex;
-    gap: 20px;
+    gap: 16px;
   }
 
-  .stat {
-    text-align: center;
-  }
-
-  .stat .val {
-    font-size: 18px;
-    font-weight: 700;
-    color: #58a6ff;
-  }
-
-  .stat .lbl {
-    font-size: 10px;
-    color: #8b949e;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
+  .stat { text-align: center; }
+  .stat .val { font-size: 16px; font-weight: 700; color: #58a6ff; }
+  .stat .lbl { font-size: 9px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
 
   /* MAIN LAYOUT */
   .main {
     display: flex;
     flex: 1;
     overflow: hidden;
+    position: relative;
   }
 
-  /* SIDEBAR */
+  /* MAP */
+  #map {
+    flex: 1;
+    background: #0d1117;
+    z-index: 1;
+  }
+
+  /* ── DESKTOP SIDEBAR ── */
   .sidebar {
     width: 340px;
     background: #161b22;
@@ -92,6 +86,7 @@
     flex-shrink: 0;
     scrollbar-width: thin;
     scrollbar-color: #30363d #161b22;
+    z-index: 2;
   }
 
   .sidebar::-webkit-scrollbar { width: 4px; }
@@ -106,6 +101,78 @@
     color: #8b949e;
     text-transform: uppercase;
     letter-spacing: 0.8px;
+  }
+
+  /* ── MOBILE BOTTOM SHEET ── */
+  @media (max-width: 640px) {
+    .header-title p { display: none; }
+    .stat .val { font-size: 14px; }
+    .stat:nth-child(3), .stat:nth-child(4) { display: none; }
+
+    .main { flex-direction: column; }
+
+    #map {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    /* Bottom sheet */
+    .sidebar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      width: 100%;
+      height: 52px; /* collapsed: just the handle + header */
+      max-height: 80dvh;
+      border-right: none;
+      border-top: 1px solid #30363d;
+      border-radius: 20px 20px 0 0;
+      z-index: 500;
+      overflow: hidden;
+      transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #161b22;
+    }
+
+    .sidebar.open {
+      height: 70dvh;
+      overflow-y: auto;
+    }
+
+    .sidebar-handle {
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .sidebar-handle::before {
+      content: '';
+      width: 36px;
+      height: 4px;
+      background: #484f58;
+      border-radius: 2px;
+    }
+
+    .sidebar-header {
+      padding: 8px 20px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-toggle-hint {
+      display: inline-block !important;
+      font-size: 10px;
+      color: #58a6ff;
+    }
+  }
+
+  @media (min-width: 641px) {
+    .sidebar-handle { display: none; }
+    .sidebar-toggle-hint { display: none; }
   }
 
   /* DAY CARDS */
@@ -206,12 +273,6 @@
     font-size: 10px;
     color: #79c0ff;
     margin-top: 6px;
-  }
-
-  /* MAP */
-  #map {
-    flex: 1;
-    background: #0d1117;
   }
 
   /* POPUP STYLES */
@@ -441,14 +502,18 @@
 </header>
 
 <div class="main">
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-header">📍 Day-by-Day Itinerary</div>
-    <div id="day-list"></div>
-  </div>
-
   <!-- MAP -->
   <div id="map"></div>
+
+  <!-- SIDEBAR / MOBILE BOTTOM SHEET -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-handle" id="sidebar-handle"></div>
+    <div class="sidebar-header" id="sidebar-header">
+      📍 Day-by-Day Itinerary
+      <span class="sidebar-toggle-hint">tap to expand ↑</span>
+    </div>
+    <div id="day-list"></div>
+  </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -907,10 +972,56 @@ legendEl.innerHTML = `
   <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> Main route</div>
   <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> D2 drive stops</div>
   <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div> Lake Pukaki stop</div>
-  <div class="legend-item" style="margin-top:8px; font-size:10px; color:#8b949e;">Click any marker for details</div>
+  <div class="legend-item" style="margin-top:8px; font-size:10px; color:#8b949e;">Tap any marker for details</div>
 `;
 document.querySelector('.main').appendChild(legendEl);
-legendEl.style.cssText += 'position:absolute;bottom:28px;right:12px;z-index:1000;';
+legendEl.style.cssText += 'position:absolute;bottom:70px;right:12px;z-index:1000;';
+
+// ========================
+// MOBILE BOTTOM SHEET
+// ========================
+const sidebar = document.getElementById('sidebar');
+const handle = document.getElementById('sidebar-handle');
+const sidebarHeader = document.getElementById('sidebar-header');
+const toggleHint = document.querySelector('.sidebar-toggle-hint');
+
+function isMobile() { return window.innerWidth <= 640; }
+
+function toggleSheet() {
+  if (!isMobile()) return;
+  const isOpen = sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', !isOpen);
+  if (toggleHint) {
+    toggleHint.textContent = isOpen ? 'tap to expand ↑' : 'tap to collapse ↓';
+  }
+  // Shift legend up when sheet opens
+  legendEl.style.bottom = !isOpen ? '75dvh' : '70px';
+}
+
+handle?.addEventListener('click', toggleSheet);
+sidebarHeader?.addEventListener('click', toggleSheet);
+
+// Close sheet when map is tapped
+map.on('click', () => {
+  if (isMobile() && sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    if (toggleHint) toggleHint.textContent = 'tap to expand ↑';
+    legendEl.style.bottom = '70px';
+  }
+});
+
+// When a day card is clicked on mobile, close the sheet after flying
+document.querySelectorAll('.day-card').forEach(card => {
+  card.addEventListener('click', () => {
+    if (isMobile()) {
+      setTimeout(() => {
+        sidebar.classList.remove('open');
+        if (toggleHint) toggleHint.textContent = 'tap to expand ↑';
+        legendEl.style.bottom = '70px';
+      }, 300);
+    }
+  });
+});
 
 </script>
 </body>
