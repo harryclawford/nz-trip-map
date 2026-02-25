@@ -58,6 +58,7 @@ header {
 .tab-btn.active { color: #58a6ff; border-bottom-color: #58a6ff; }
 .tab-btn.active.t-lodging { color: #3fb950; border-bottom-color: #3fb950; }
 .tab-btn.active.t-dining { color: #f0883e; border-bottom-color: #f0883e; }
+.tab-btn.active.t-cost { color: #e3b341; border-bottom-color: #e3b341; }
 
 /* ══ TAB CONTENT ══ */
 #tab-content { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #30363d #161b22; }
@@ -218,6 +219,11 @@ header {
 }
 .dining-dish::before { content: '🍴'; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
 .dining-vibe { font-size: 13px; color: #8b949e; font-style: italic; line-height: 1.5; margin-bottom: 10px; }
+.dining-rating {
+  font-size: 12px; font-weight: 600; color: #f0883e;
+  background: rgba(240,136,62,0.1); border: 1px solid rgba(240,136,62,0.25);
+  border-radius: 8px; padding: 3px 8px;
+}
 
 /* ══ CARD ACTION BUTTONS ══ */
 .card-actions { display: flex; gap: 8px; margin-top: 2px; }
@@ -299,6 +305,37 @@ header {
 .carousel-arrow.next{right:8px}
 @media(max-width:640px){.card-carousel{height:180px}.carousel-arrow{display:none!important}}
 .lodging-card,.dining-card,.day-card{overflow:hidden}
+
+/* ══ COST TAB ══ */
+.cost-overview { padding: 16px 20px 0; }
+.cost-total-card { background: linear-gradient(135deg, rgba(63,185,80,0.1), rgba(88,166,255,0.06)); border: 1px solid rgba(63,185,80,0.3); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 12px; }
+.cost-total-label { font-size: 11px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+.cost-total-amount { font-size: 34px; font-weight: 800; color: #3fb950; letter-spacing: -1px; line-height: 1.1; }
+.cost-total-nights { font-size: 13px; color: #8b949e; margin-top: 4px; }
+.cost-range { display: flex; gap: 8px; margin-bottom: 16px; }
+.cost-range-item { flex: 1; padding: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid #21262d; text-align: center; }
+.cost-range-item .r-label { font-size: 10px; color: #6e7681; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+.cost-range-item .r-val { font-size: 13px; font-weight: 700; color: #8b949e; }
+.cost-leg { border-bottom: 1px solid #21262d; }
+.cost-leg-header { padding: 12px 20px 6px; display: flex; align-items: center; justify-content: space-between; background: #0f1318; }
+.cost-leg-left { display: flex; align-items: center; gap: 8px; }
+.cost-leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.cost-leg-name { font-size: 14px; font-weight: 700; color: #e6edf3; }
+.cost-leg-nights-tag { font-size: 11px; color: #8b949e; background: rgba(255,255,255,0.05); border: 1px solid #21262d; border-radius: 6px; padding: 2px 6px; }
+.cost-leg-subtotal { font-size: 15px; font-weight: 700; color: #3fb950; }
+.cost-option { margin: 0 16px 8px; padding: 11px 13px; background: #1c2128; border: 1.5px solid #30363d; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+.cost-option:first-of-type { margin-top: 10px; }
+.cost-option:last-of-type { margin-bottom: 12px; }
+.cost-option:hover { border-color: rgba(63,185,80,0.5); }
+.cost-option.selected { border-color: #3fb950; background: rgba(63,185,80,0.06); }
+.cost-option-row { display: flex; align-items: center; gap: 10px; }
+.cost-opt-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #484f58; flex-shrink: 0; position: relative; }
+.cost-option.selected .cost-opt-radio { border-color: #3fb950; background: #3fb950; }
+.cost-option.selected .cost-opt-radio::after { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:6px; height:6px; border-radius:50%; background:#fff; }
+.cost-opt-name { font-size: 13px; font-weight: 600; color: #e6edf3; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cost-opt-ppn { font-size: 13px; font-weight: 700; color: #e3b341; flex-shrink: 0; }
+.cost-opt-total { font-size: 12px; color: #8b949e; padding-left: 26px; margin-top: 3px; }
+.cost-opt-beds { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; color: #79c0ff; background: rgba(88,166,255,0.08); border: 1px solid rgba(88,166,255,0.15); border-radius: 5px; padding: 1px 6px; margin-left: 6px; }
 </style>
 </head>
 <body>
@@ -327,6 +364,7 @@ header {
     <button class="tab-btn active t-itinerary" data-tab="itinerary"><span class="tab-icon">📍</span><span class="tab-label">Itinerary</span></button>
     <button class="tab-btn t-lodging" data-tab="lodging"><span class="tab-icon">🏠</span><span class="tab-label">Lodging</span></button>
     <button class="tab-btn t-dining" data-tab="dining"><span class="tab-icon">🍽️</span><span class="tab-label">Dining</span></button>
+    <button class="tab-btn t-cost" data-tab="cost"><span class="tab-icon">💰</span><span class="tab-label">Cost</span></button>
   </div>
   <div id="tab-content"></div>
 </div>
@@ -430,12 +468,13 @@ const days = [
 
 const locations = [
   {
-    id: "christchurch", name: "Christchurch", days: [1],
+    id: "christchurch", name: "Christchurch", days: [1], nights: 1,
     coords: [-43.5321, 172.6362], color: "#58a6ff",
     lodging: [
       {
         name: "Option 1 — Airport Motel",
         type: "Motel · Near Airport", price: "$$",
+        costPerPP: 535,
         costNote: "HK$535/pp · HK$3,210/night", costDetail: "6 pax / 3 beds",
         note: "Close to CHC airport. Simple and practical for arrival night. ⚠️ Only 3 beds — 2 people sharing.",
         photos: ["https://upload.wikimedia.org/wikipedia/commons/7/7a/The_George%2C_Christchurch%2C_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg"],
@@ -447,6 +486,7 @@ const locations = [
       {
         name: "Option 2 — 4-Bed Christchurch Home",
         type: "Airbnb · Whole House", price: "$$",
+        costPerPP: 605,
         costNote: "HK$605/pp · HK$3,630/night", costDetail: "6 pax / 4 beds",
         note: "4 proper beds for 6 pax. Better for the group — everyone gets a bed.",
         photos: ["https://a0.muscache.com/im/pictures/hosting/Hosting-1553381294664289544/original/14a53380-d3ef-4b0b-8bcb-bb4c03f6e516.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/hosting/Hosting-1553381294664289544/original/24432978-cc8f-497f-9174-b80e2682a2b4.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/hosting/Hosting-1553381294664289544/original/c5c785b5-1104-4793-986f-204d96533e65.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/hosting/Hosting-1553381294664289544/original/4b79139e-6f3a-4b4d-bada-1515a8863e86.jpeg?aki_policy=large"],
@@ -475,6 +515,8 @@ const locations = [
         photos: ["https://upload.wikimedia.org/wikipedia/commons/e/e4/Christchurch_Art_Gallery_from_the_square.JPG","https://upload.wikimedia.org/wikipedia/commons/b/bd/The_%22Brill%22_Tram_178.New_Regent_St_Christchurch._%2811510530335%29.jpg"],
         status: "deciding",
         coords: [-43.5301, 172.6352],
+        rating: "4.4",
+        bookingUrl: "https://fiddlesticksbar.co.nz/reservations/",
         mapsUrl: "https://maps.google.com/?q=Fiddlesticks+Christchurch+NZ"
       },
       {
@@ -490,12 +532,13 @@ const locations = [
     ]
   },
   {
-    id: "tekapo", name: "Lake Tekapo", days: [2, 3],
+    id: "tekapo", name: "Lake Tekapo", days: [2, 3], nights: 2,
     coords: [-44.0038, 170.4786], color: "#3fb950",
     lodging: [
       {
         name: "Option 3 — Eclipse Haven (Hot Tub) ⭐",
         type: "Airbnb · 2BR Studio", price: "$$",
+        costPerPP: 463,
         costNote: "HK$463/pp · HK$2,778/night", costDetail: "6 pax / 3 beds only ⚠️",
         note: "Karl's pick 🙋 Hot tub with lake views. Cozy, unique — but only 3 beds for 6 pax, 2 people sharing. Ohana Stays.",
         photos: ["https://assets.guesty.com/image/upload/v1744646241/production/6548291210675435b724622a/sbcjonwsvpkzpey5sdqg.jpg","https://assets.guesty.com/image/upload/v1744646238/production/6548291210675435b724622a/oces5a49n9vgouxws6ck.jpg","https://assets.guesty.com/image/upload/v1717997974/production/6548291210675435b724622a/vprrrxilxx5597yyxqhr.jpg","https://assets.guesty.com/image/upload/v1744698748/production/6548291210675435b724622a/vew41zb8cwbk7mnj6nfx.jpg"],
@@ -507,6 +550,7 @@ const locations = [
       {
         name: "Option 4 — Puku-hape Holiday Home",
         type: "Holiday Home · 4 Beds", price: "$$$",
+        costPerPP: 789,
         costNote: "HK$789/pp · HK$4,734/night", costDetail: "6 pax / 4 beds · no hot tub",
         note: "4 proper beds, everyone sleeps comfortably. No hot tub though. Costs more but solves the beds problem.",
         photos: ["https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg","https://upload.wikimedia.org/wikipedia/commons/5/57/Church_of_the_Good_Shepherd%2C_Tekapo_01.jpg","https://upload.wikimedia.org/wikipedia/commons/1/18/Lake_Tekapo_and_lupins.jpg"],
@@ -525,6 +569,8 @@ const locations = [
         photos: ["https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg","https://upload.wikimedia.org/wikipedia/commons/5/57/Church_of_the_Good_Shepherd%2C_Tekapo_01.jpg"],
         status: "deciding",
         coords: [-44.0031, 170.4789],
+        rating: "4.3",
+        bookingUrl: "https://www.kohanrestaurant.co.nz/",
         mapsUrl: "https://maps.google.com/?q=Kohan+Restaurant+Lake+Tekapo"
       },
       {
@@ -535,6 +581,8 @@ const locations = [
         photos: ["https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Lake_Tekapo_-_New_Zealand.jpg/1280px-Lake_Tekapo_-_New_Zealand.jpg","https://upload.wikimedia.org/wikipedia/commons/6/65/LakeTekapoNov242024_05.jpg"],
         status: "deciding",
         coords: [-44.0044, 170.4777],
+        rating: "4.2",
+        bookingUrl: "https://www.peppers.co.nz/bluewater/dining/",
         mapsUrl: "https://maps.google.com/?q=Mackenzies+Bar+Grill+Lake+Tekapo"
       },
       {
@@ -550,12 +598,13 @@ const locations = [
     ]
   },
   {
-    id: "mtcook", name: "Mt Cook Village", days: [4, 5],
+    id: "mtcook", name: "Mt Cook Village", days: [4, 5], nights: 2,
     coords: [-43.7359, 170.0966], color: "#f0883e",
     lodging: [
       {
         name: "Option 5 — Glentanner Self-Contained Cabin",
         type: "Cabin · Shared Grill", price: "$",
+        costPerPP: 478,
         costNote: "HK$478/pp · HK$2,868/night", costDetail: "6 pax / 2 beds + 1 sofa bed",
         note: "Right at the base of Aoraki with epic views. Access to shared BBQ grill area. ⚠️ Tight on beds — 2 beds + sofa bed for 6.",
         photos: ["https://www.glentanner.co.nz/wp-content/uploads/McLennan_SI_NZ_13_079_cropped.jpg","https://www.glentanner.co.nz/wp-content/uploads/Motel-3-Beds-scaled.jpg","http://www.glentanner.co.nz/wp-content/uploads/Basic-Cabin2.jpg"],
@@ -567,6 +616,7 @@ const locations = [
       {
         name: "Option 6 — Aoraki Court 2BR Unit",
         type: "Self-Contained Unit · 4 Beds", price: "$$$",
+        costPerPP: 781,
         costNote: "HK$781/pp · HK$4,686/night", costDetail: "6 pax / 4 beds",
         note: "4 beds, great Mt Cook Village location. Walking distance to Hooker Valley trailhead + Tasman Glacier road. More comfortable than Glentanner.",
         photos: ["https://aorakicourt.co.nz/wp-content/uploads/2024/09/Two-Bedroom-Unit-View-1.jpg","https://upload.wikimedia.org/wikipedia/commons/9/94/00_1700_Aoraki_Mount_Cook%2CThe_Hermitage_-_Mount-Cook-Nationalpark.jpg","https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg"],
@@ -585,6 +635,8 @@ const locations = [
         photos: ["https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg","https://upload.wikimedia.org/wikipedia/commons/2/23/Stocking_Stream_Shelter_in_Hooker_Valley_in_front_of_Aoraki_Mount_Cook_Range.jpg"],
         status: "deciding",
         coords: [-43.7355, 170.0972],
+        rating: "4.6",
+        bookingUrl: "https://www.oldmountaineers.co.nz/",
         mapsUrl: "https://maps.google.com/?q=Old+Mountaineers+Cafe+Mt+Cook+Village"
       },
       {
@@ -595,17 +647,20 @@ const locations = [
         photos: ["https://upload.wikimedia.org/wikipedia/commons/8/8d/The_Hermitage_hotel%2C_Mount_Cook%2C_New_Zealand_-_panoramio.jpg","https://upload.wikimedia.org/wikipedia/commons/f/f6/Aoraki_Mount_Cook_-_from_the_south.jpg"],
         status: "deciding",
         coords: [-43.7361, 170.0960],
+        rating: "4.1",
+        bookingUrl: "https://www.hermitage.co.nz/dining/panorama-restaurant/",
         mapsUrl: "https://maps.google.com/?q=Panorama+Restaurant+Hermitage+Mt+Cook"
       }
     ]
   },
   {
-    id: "gibbston", name: "Central Otago", days: [6],
+    id: "gibbston", name: "Central Otago", days: [6], nights: 1,
     coords: [-45.0132, 168.9481], color: "#bc8cff",
     lodging: [
       {
         name: "Option 7 — Carrick Winery, Towan Cottage",
         type: "Winery Stay · 3BR", price: "$$$",
+        costPerPP: 582,
         costNote: "HK$582/pp · HK$3,492/night", costDetail: "6 pax / 3 bedrooms · inside winery",
         note: "Sleep literally inside a working winery in Bannockburn. 3BR cottage surrounded by vines. Cellar door on-site. The most unique stay of the trip.",
         photos: ["https://www.carrick.co.nz/workspace/uploads/towan/towan-1.jpg","https://www.carrick.co.nz/workspace/uploads/towan-bedroom-900x900.jpg","https://www.carrick.co.nz/workspace/uploads/towan-entrance-900x900.jpg","https://www.carrick.co.nz/workspace/uploads/towan-landscape-1244x650.jpg"],
@@ -617,6 +672,7 @@ const locations = [
       {
         name: "Option 8 — Central Otago Airbnb (4 beds)",
         type: "Airbnb · 4 Beds", price: "$$",
+        costPerPP: 632,
         costNote: "HK$632/pp · HK$3,792/night", costDetail: "6 pax / 4 beds · not inside winery",
         note: "Not inside a winery but solid 4-bed option in the Central Otago area.",
         photos: ["https://a0.muscache.com/im/pictures/prohost-api/Hosting-1011740576663789724/original/c4368001-5a58-461e-89de-46b4db4dff1e.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/prohost-api/Hosting-1011740576663789724/original/07f7136c-094e-4ad6-9641-5f4c546b326a.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/prohost-api/Hosting-1011740576663789724/original/192b34d2-573e-4ee2-9109-dce18b9fc15b.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/prohost-api/Hosting-1011740576663789724/original/499b0e58-c465-4315-bf6d-1b8846d45172.jpeg?aki_policy=large"],
@@ -628,6 +684,7 @@ const locations = [
       {
         name: "Option 9 — Central Otago Airbnb (5 beds)",
         type: "Airbnb · 5 Beds", price: "$$",
+        costPerPP: 526,
         costNote: "HK$526/pp · HK$3,156/night", costDetail: "6 pax / 5 beds · not inside winery",
         note: "Best bed ratio of the Central Otago options. 5 beds for 6 pax — almost everyone gets their own. Not inside a winery.",
         photos: ["https://a0.muscache.com/im/pictures/94b84470-21bb-4282-8346-2889fad1b974.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/d3892b55-092b-4e5b-a80b-728b6986d42e.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/410e181d-ea7a-4510-b5e3-84df985b32a6.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/c0994f2a-aa48-45f8-b13d-5c847681d273.jpg?aki_policy=large"],
@@ -646,6 +703,8 @@ const locations = [
         photos: ["https://amisfield.co.nz/cdn/shop/files/Atmos_DSC00593_85_1c41c372-0b26-4db6-b8fb-a0a9aa5f7288_1.jpg","https://upload.wikimedia.org/wikipedia/commons/4/40/Peregrine_Winery%2C_Gibbston.jpg"],
         status: "deciding",
         coords: [-44.9890, 168.8950],
+        rating: "4.6",
+        bookingUrl: "https://amisfield.co.nz/dining/",
         mapsUrl: "https://maps.google.com/?q=Amisfield+Bistro+Queenstown"
       },
       {
@@ -671,12 +730,13 @@ const locations = [
     ]
   },
   {
-    id: "queenstown", name: "Queenstown", days: [7, 8, 9],
+    id: "queenstown", name: "Queenstown", days: [7, 8, 9], nights: 2,
     coords: [-45.0312, 168.6626], color: "#ff7b72",
     lodging: [
       {
         name: "Option 10 — Queenstown Airbnb (5 beds)",
         type: "Airbnb · 5 Beds", price: "$$",
+        costPerPP: 599,
         costNote: "HK$599/pp · HK$3,594/night", costDetail: "6 pax / 5 beds",
         note: "5 beds for 6 pax. Solid Queenstown base.",
         photos: ["https://a0.muscache.com/im/pictures/7f638743-4054-4ef0-8c3f-d9f9133845d0.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/52d9f81a-1c81-44c5-9b4d-a8034954205e.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/19714285-0747-4109-995d-fb503ab5f2bf.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/miso/Hosting-33571005/original/02fa8f16-704a-4fef-af39-68755b0bbada.jpeg?aki_policy=large"],
@@ -688,6 +748,7 @@ const locations = [
       {
         name: "Option 11 — Queenstown Airbnb (5 beds) #2",
         type: "Airbnb · 5 Beds", price: "$$",
+        costPerPP: 621,
         costNote: "HK$621/pp · HK$3,726/night", costDetail: "6 pax / 5 beds",
         note: "Another 5-bed option. Slightly pricier than #10.",
         photos: ["https://a0.muscache.com/im/pictures/hosting/Hosting-1514170091372902919/original/927d7875-ed28-44f1-9b66-db52a93be73e.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/hosting/Hosting-1514170091372902919/original/17a3a559-38ab-421e-818c-6c6dd7564416.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/hosting/Hosting-1514170091372902919/original/5ce99f71-70e6-481d-bab8-ed0e349474a3.jpeg?aki_policy=large","https://a0.muscache.com/im/pictures/prohost-api/Hosting-1514170091372902919/original/3acc16c1-62d6-4a03-b29b-4f35de9d9a50.jpeg?aki_policy=large"],
@@ -699,6 +760,7 @@ const locations = [
       {
         name: "Option 12 — Downtown Queenstown (5 beds)",
         type: "Airbnb · 5 Beds · Downtown", price: "$$$",
+        costPerPP: 669,
         costNote: "HK$669/pp · HK$4,014/night", costDetail: "6 pax / 5 beds · closest to town",
         note: "Most expensive but closest to Queenstown downtown. Walk to Fergburger, lakefront, restaurants — no Uber needed.",
         photos: ["https://a0.muscache.com/im/pictures/d7beae0d-7e9f-4362-bd46-811672667ea9.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/6d9ad352-b345-44fe-ba81-ce4ff6190204.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/f589240e-1596-4d17-8e00-eaeba137039d.jpg?aki_policy=large","https://a0.muscache.com/im/pictures/cd62d062-2e45-4e23-85e6-e85be443b945.jpg?aki_policy=large"],
@@ -727,6 +789,8 @@ const locations = [
         photos: ["https://upload.wikimedia.org/wikipedia/commons/2/29/Queenstown_at_night.jpg","https://upload.wikimedia.org/wikipedia/commons/a/a9/Queenstown%2C_New_Zealand.jpg"],
         status: "deciding",
         coords: [-45.0308, 168.6601],
+        rating: "4.5",
+        bookingUrl: "https://ratadining.co.nz/",
         mapsUrl: "https://maps.google.com/?q=Rata+Restaurant+Queenstown"
       },
       {
@@ -737,6 +801,8 @@ const locations = [
         photos: ["https://botswanabutchery.nz/wp-content/uploads/2016/12/Botswana_Web_Intro-20Dec16-D1b_04.jpg","https://botswanabutchery.nz/wp-content/uploads/2016/12/Botswana_Web_Intro-20Dec16-D1b_06.jpg"],
         status: "deciding",
         coords: [-45.0301, 168.6589],
+        rating: "4.4",
+        bookingUrl: "https://botswanabutchery.nz/queenstown/",
         mapsUrl: "https://maps.google.com/?q=Botswana+Butchery+Queenstown"
       }
     ]
@@ -869,7 +935,7 @@ locations.forEach(loc => {
   loc.lodging.forEach((l, i) => {
     const offset = (i - (loc.lodging.length-1)/2) * 0.003;
     const icon = L.divIcon({ className:'', html:`<div style="width:32px;height:32px;background:${loc.color};border-radius:50%;border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 3px 12px rgba(0,0,0,0.5);cursor:pointer;">🏠</div>`, iconSize:[32,32], iconAnchor:[16,16] });
-    const popup = `<div class="popup-inner" style="--popup-color:${loc.color}"><div class="popup-badge">🏠 ${loc.name}</div><div class="popup-title">${l.name}</div><ul class="popup-items"><li>${l.type}</li><li>${l.price}</li><li>${l.note}</li></ul></div>`;
+    const popup = `<div class="popup-inner" style="--popup-color:${loc.color}"><div class="popup-badge">🏠 ${loc.name}</div><div class="popup-title">${l.name}</div><ul class="popup-items"><li>${l.type}</li><li>💰 ${l.costNote}</li><li>🛏️ ${l.costDetail}</li><li>${l.note.split('.')[0]}.</li></ul></div>`;
     L.marker([l.coords[0]+offset, l.coords[1]], { icon }).bindPopup(popup, { maxWidth:280 }).addTo(lodgingLayer);
   });
 });
@@ -969,8 +1035,10 @@ function renderLodging() {
 
 function renderDining() {
   const content = document.getElementById('tab-content');
-  content.innerHTML = `<div class="section-header"><span>🍽️ Dining Options</span><span class="updated-tag">Updated ${LAST_UPDATED}</span></div>`;
+  content.innerHTML = `<div class="section-header"><span>🍽️ Dining Options</span><span class="updated-tag">Bookable restaurants only</span></div>`;
   locations.forEach(loc => {
+    const bookableDining = loc.dining.filter(d => d.bookingUrl);
+    if (!bookableDining.length) return;
     const group = document.createElement('div');
     group.className = 'location-group';
     const dayLabels = loc.days.map(d => { const day = days.find(x => x.id === d); return day ? day.label : ''; }).join(', ');
@@ -982,18 +1050,20 @@ function renderDining() {
           <div class="location-group-days">${dayLabels}</div>
         </div>
       </div>
-      ${loc.dining.map((d, i) => `
+      ${bookableDining.map((d, i) => `
         <div class="dining-card${d.status === 'booked' ? ' is-booked' : ''}" id="dining-${loc.id}-${i}">
           ${carouselHTML(d.photos,d.name)}
           ${statusBadge(d.status)}
           <div class="dining-name">${d.name}</div>
           <div class="dining-meta">
             <span class="dining-type">${d.type}</span>
+            ${d.rating ? `<span class="dining-rating">⭐ ${d.rating}</span>` : ''}
           </div>
           <div class="dining-dish">${d.dish}</div>
           <div class="dining-vibe">${d.vibe}</div>
           <div class="card-actions">
             <a href="${d.mapsUrl}" target="_blank" rel="noopener" class="card-btn maps">📍 Google Maps</a>
+            <a href="${d.bookingUrl}" target="_blank" rel="noopener" class="card-btn book">📅 Reserve</a>
           </div>
         </div>
       `).join('')}
@@ -1001,6 +1071,101 @@ function renderDining() {
     content.appendChild(group);
   });
   setTimeout(initCarousels,0);
+}
+
+// ═══════════════════════════════════════
+// COST TAB
+// ═══════════════════════════════════════
+
+// Cost selections state
+const costSelections = {};
+locations.forEach(loc => { costSelections[loc.id] = 0; }); // default first option
+
+function calcTotalCost() {
+  return locations.reduce((sum, loc) => {
+    const sel = costSelections[loc.id] || 0;
+    const lodging = loc.lodging[sel];
+    return sum + (lodging ? lodging.costPerPP * loc.nights : 0);
+  }, 0);
+}
+
+function renderCost() {
+  const content = document.getElementById('tab-content');
+  const minTotal = locations.reduce((s, loc) => s + Math.min(...loc.lodging.map(l => l.costPerPP)) * loc.nights, 0);
+  const maxTotal = locations.reduce((s, loc) => s + Math.max(...loc.lodging.map(l => l.costPerPP)) * loc.nights, 0);
+  const totalNights = locations.reduce((s, loc) => s + loc.nights, 0);
+
+  content.innerHTML = `
+    <div class="section-header"><span>💰 Lodging Cost Per Head</span><span class="updated-tag">6 pax</span></div>
+    <div class="cost-overview">
+      <div class="cost-total-card">
+        <div class="cost-total-label">Selected Total / Person</div>
+        <div class="cost-total-amount" id="cost-total-display">HK$${calcTotalCost().toLocaleString()}</div>
+        <div class="cost-total-nights">${totalNights} nights · lodging only</div>
+      </div>
+      <div class="cost-range">
+        <div class="cost-range-item"><div class="r-label">Min possible</div><div class="r-val">HK$${minTotal.toLocaleString()}</div></div>
+        <div class="cost-range-item"><div class="r-label">Max possible</div><div class="r-val">HK$${maxTotal.toLocaleString()}</div></div>
+        <div class="cost-range-item"><div class="r-label">Avg/night</div><div class="r-val">HK$${Math.round(calcTotalCost()/totalNights).toLocaleString()}</div></div>
+      </div>
+    </div>
+  `;
+
+  locations.forEach(loc => {
+    const leg = document.createElement('div');
+    leg.className = 'cost-leg';
+    const selLodging = loc.lodging[costSelections[loc.id] || 0];
+    const legTotal = selLodging ? selLodging.costPerPP * loc.nights : 0;
+
+    leg.innerHTML = `
+      <div class="cost-leg-header">
+        <div class="cost-leg-left">
+          <div class="cost-leg-dot" style="background:${loc.color}"></div>
+          <div class="cost-leg-name">${loc.name}</div>
+          <div class="cost-leg-nights-tag">${loc.nights}N</div>
+        </div>
+        <div class="cost-leg-subtotal" id="leg-total-${loc.id}">HK$${legTotal.toLocaleString()}</div>
+      </div>
+      ${loc.lodging.map((l, i) => `
+        <div class="cost-option${(costSelections[loc.id]||0) === i ? ' selected' : ''}" data-loc="${loc.id}" data-idx="${i}">
+          <div class="cost-option-row">
+            <div class="cost-opt-radio"></div>
+            <div class="cost-opt-name">${l.name}</div>
+            <div class="cost-opt-ppn">HK$${l.costPerPP}/pp</div>
+          </div>
+          <div class="cost-opt-total">HK$${(l.costPerPP * loc.nights).toLocaleString()} total for ${loc.nights} night${loc.nights>1?'s':''}<span class="cost-opt-beds">🛏️ ${l.costDetail}</span></div>
+        </div>
+      `).join('')}
+    `;
+    content.appendChild(leg);
+  });
+
+  // Bind click events
+  content.querySelectorAll('.cost-option').forEach(el => {
+    el.addEventListener('click', () => {
+      const locId = el.dataset.loc;
+      const idx = parseInt(el.dataset.idx);
+      costSelections[locId] = idx;
+      // Update UI
+      content.querySelectorAll(`.cost-option[data-loc="${locId}"]`).forEach((opt, i) => {
+        opt.classList.toggle('selected', i === idx);
+      });
+      const loc = locations.find(l => l.id === locId);
+      if (loc) {
+        const selLodging = loc.lodging[idx];
+        const legTotal = selLodging ? selLodging.costPerPP * loc.nights : 0;
+        const legEl = document.getElementById(`leg-total-${locId}`);
+        if (legEl) legEl.textContent = 'HK$' + legTotal.toLocaleString();
+      }
+      // Update grand total + avg/night
+      const totalEl = document.getElementById('cost-total-display');
+      if (totalEl) totalEl.textContent = 'HK$' + calcTotalCost().toLocaleString();
+      // Also update avg/night display (3rd range item)
+      const totalNights = locations.reduce((s, l) => s + l.nights, 0);
+      const avgEl = content.querySelectorAll('.cost-range-item')[2]?.querySelector('.r-val');
+      if (avgEl) avgEl.textContent = 'HK$' + Math.round(calcTotalCost()/totalNights).toLocaleString();
+    });
+  });
 }
 
 // ═══════════════════════════════════════
@@ -1018,6 +1183,7 @@ function switchTab(tab) {
   if (tab === 'itinerary') renderItinerary();
   else if (tab === 'lodging') renderLodging();
   else if (tab === 'dining') renderDining();
+  else if (tab === 'cost') renderCost();
 }
 
 document.querySelectorAll('.tab-btn').forEach(btn => {
