@@ -848,7 +848,6 @@ function renderItinerary() {
       <div class="day-activities">
         ${day.activities.map(a => `<div class="activity"><span class="dot"></span><span>${a}</span></div>`).join('')}
         ${day.stay ? `<div class="stay-tag">🏠 ${day.stay}</div>` : ''}
-        ${day.vibes ? `<div class="vibes-pill">✨ ${day.vibes}</div>` : ''}
       </div>
     `;
     card.addEventListener('click', () => {
