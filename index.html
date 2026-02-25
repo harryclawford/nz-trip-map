@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NZ Trip — Apr 25 – May 3, 2025</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0d1117;
+    color: #e6edf3;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #161b22 0%, #1a2332 100%);
+    border-bottom: 1px solid #30363d;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .nz-flag {
+    font-size: 24px;
+  }
+
+  .header-title h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #58a6ff;
+    letter-spacing: -0.3px;
+  }
+
+  .header-title p {
+    font-size: 12px;
+    color: #8b949e;
+    margin-top: 1px;
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 20px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat .val {
+    font-size: 18px;
+    font-weight: 700;
+    color: #58a6ff;
+  }
+
+  .stat .lbl {
+    font-size: 10px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 340px;
+    background: #161b22;
+    border-right: 1px solid #30363d;
+    overflow-y: auto;
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #30363d #161b22;
+  }
+
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-track { background: #161b22; }
+  .sidebar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+
+  .sidebar-header {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #21262d;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  /* DAY CARDS */
+  .day-card {
+    border-bottom: 1px solid #21262d;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    position: relative;
+  }
+
+  .day-card:hover {
+    background: #1c2128;
+  }
+
+  .day-card.active {
+    background: #1c2128;
+    border-left: 3px solid var(--day-color);
+  }
+
+  .day-header {
+    padding: 14px 20px 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .day-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--day-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+
+  .day-meta {
+    flex: 1;
+  }
+
+  .day-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e6edf3;
+    line-height: 1.3;
+  }
+
+  .day-date {
+    font-size: 11px;
+    color: #8b949e;
+    margin-top: 2px;
+  }
+
+  .day-location {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--day-color);
+    margin-top: 3px;
+  }
+
+  .day-activities {
+    padding: 0 20px 14px 68px;
+  }
+
+  .activity {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 3px 0;
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.4;
+  }
+
+  .activity .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--day-color);
+    flex-shrink: 0;
+    margin-top: 5px;
+    opacity: 0.7;
+  }
+
+  .stay-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.2);
+    border-radius: 12px;
+    padding: 3px 8px;
+    font-size: 10px;
+    color: #79c0ff;
+    margin-top: 6px;
+  }
+
+  /* MAP */
+  #map {
+    flex: 1;
+    background: #0d1117;
+  }
+
+  /* POPUP STYLES */
+  .leaflet-popup-content-wrapper {
+    background: #161b22 !important;
+    border: 1px solid #30363d !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+    padding: 0 !important;
+  }
+
+  .leaflet-popup-content {
+    margin: 0 !important;
+    min-width: 240px;
+  }
+
+  .leaflet-popup-tip-container { display: none; }
+  .leaflet-popup-close-button {
+    color: #8b949e !important;
+    top: 8px !important;
+    right: 8px !important;
+    font-size: 18px !important;
+  }
+
+  .popup-inner {
+    padding: 16px 18px 14px;
+  }
+
+  .popup-day-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--popup-color);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .popup-location {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e6edf3;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .popup-items {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .popup-items li {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 12px;
+    color: #8b949e;
+    line-height: 1.4;
+  }
+
+  .popup-items li::before {
+    content: '→';
+    color: var(--popup-color);
+    font-size: 10px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  .popup-stay {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #21262d;
+    font-size: 11px;
+    color: #79c0ff;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* DRIVE BADGE */
+  .drive-badge {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: #8b949e;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* LEGEND */
+  .legend {
+    position: absolute;
+    bottom: 28px;
+    right: 12px;
+    z-index: 1000;
+    background: rgba(22, 27, 34, 0.95);
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 12px 14px;
+    backdrop-filter: blur(10px);
+  }
+
+  .legend-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #c9d1d9;
+    margin-bottom: 4px;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* CUSTOM MARKER */
+  .custom-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    font-weight: 700;
+    color: white;
+    font-size: 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  .custom-marker:hover {
+    transform: scale(1.15);
+  }
+
+  /* ROUTE LINE LABEL */
+  .route-label {
+    background: rgba(22,27,34,0.9);
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 2px 7px;
+    font-size: 10px;
+    color: #8b949e;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-title">
+    <span class="nz-flag">🇳🇿</span>
+    <div>
+      <h1>South Island Road Trip</h1>
+      <p>Christchurch → Lake Tekapo → Mt Cook → Queenstown</p>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="stat"><div class="val">9</div><div class="lbl">Days</div></div>
+    <div class="stat"><div class="val">5</div><div class="lbl">Locations</div></div>
+    <div class="stat"><div class="val">Apr 25</div><div class="lbl">Departure</div></div>
+    <div class="stat"><div class="val">May 3</div><div class="lbl">Return</div></div>
+  </div>
+</header>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">📍 Day-by-Day Itinerary</div>
+    <div id="day-list"></div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ========================
+// ITINERARY DATA
+// ========================
+const days = [
+  {
+    id: 1,
+    label: "D1 (Sat)",
+    date: "Apr 25",
+    location: "Christchurch",
+    coords: [-43.5321, 172.6362],
+    color: "#58a6ff",
+    activities: [
+      "Land AKL/SYD Airport",
+      "Domestic flight to Christchurch"
+    ],
+    stay: "Christchurch BnB",
+    drive: null
+  },
+  {
+    id: 2,
+    label: "D2 (Sun)",
+    date: "Apr 26",
+    location: "Lake Tekapo",
+    coords: [-44.0038, 170.4786],
+    color: "#3fb950",
+    activities: [
+      "3 hr drive from Christchurch",
+      "Pit stops: Ashburton, Methven, Geraldine, Rakaia Gorge, Fairlie",
+      "Tour around Lake Tekapo"
+    ],
+    stay: "BnB Lodge with hot tub 🛁",
+    drive: "3 hrs from Christchurch"
+  },
+  {
+    id: 3,
+    label: "D3 (Mon)",
+    date: "Apr 27",
+    location: "Lake Tekapo",
+    coords: [-44.0038, 170.4786],
+    color: "#3fb950",
+    activities: [
+      "Peninsula Walkway / Lakeside Trail",
+      "Lake Alexandrina",
+      "Tekapo Springs"
+    ],
+    stay: "BnB Lodge with hot tub 🛁",
+    drive: null
+  },
+  {
+    id: 4,
+    label: "D4 (Tue)",
+    date: "Apr 28",
+    location: "Mt Cook Village",
+    coords: [-43.7359, 170.0966],
+    color: "#f0883e",
+    activities: [
+      "1.5 hr drive to Aoraki/Mt Cook Village",
+      "Mt Cook Alpine Salmon Shop",
+      "Picnic next to Lake Pukaki",
+      "Tasman Glacier View Track (1.5km ~40 mins)"
+    ],
+    stay: "Mt Cook Village BnB",
+    drive: "1.5 hrs from Lake Tekapo"
+  },
+  {
+    id: 5,
+    label: "D5 (Wed)",
+    date: "Apr 29",
+    location: "Mt Cook Village",
+    coords: [-43.7359, 170.0966],
+    color: "#f0883e",
+    activities: [
+      "Hooker Valley Track (3–4 hrs, flat road)",
+      "or Kea Point Track (3km ~2 hrs, stairs)",
+      "Glentanner Park / Aoraki Alpine Lodge",
+      "Outdoor BBQ picnic"
+    ],
+    stay: "Mt Cook Village BnB",
+    drive: null
+  },
+  {
+    id: 6,
+    label: "D6 (Thu)",
+    date: "Apr 30",
+    location: "Gibbston Valley",
+    coords: [-45.0132, 168.9481],
+    color: "#bc8cff",
+    activities: [
+      "2.5 hr drive to Cromwell",
+      "Winery visits in Gibbston Valley"
+    ],
+    stay: "Winery cottage 🍷",
+    drive: "2.5 hrs from Mt Cook"
+  },
+  {
+    id: 7,
+    label: "D7 (Fri)",
+    date: "May 1",
+    location: "Queenstown",
+    coords: [-45.0312, 168.6626],
+    color: "#ff7b72",
+    activities: [
+      "Optional: morning winery visit",
+      "1 hr drive to Queenstown"
+    ],
+    stay: "Queenstown BnB",
+    drive: "~1 hr from Gibbston"
+  },
+  {
+    id: 8,
+    label: "D8 (Sat)",
+    date: "May 2",
+    location: "Queenstown",
+    coords: [-45.0312, 168.6626],
+    color: "#ff7b72",
+    activities: [
+      "TSS Earnslaw cruise? 🚢",
+      "Explore Queenstown"
+    ],
+    stay: "Queenstown BnB",
+    drive: null
+  },
+  {
+    id: 9,
+    label: "D9 (Sun)",
+    date: "May 3",
+    location: "Depart",
+    coords: [-45.0312, 168.6626],
+    color: "#8b949e",
+    activities: [
+      "Depart to AKL/SYD Airport",
+      "Transit to HKG 🏠"
+    ],
+    stay: null,
+    drive: null
+  }
+];
+
+// Pit stops on D2 drive
+const pitStops = [
+  { name: "Ashburton", coords: [-43.9036, 171.7280] },
+  { name: "Methven", coords: [-43.6276, 171.6497] },
+  { name: "Rakaia Gorge", coords: [-43.5800, 171.4200] },
+  { name: "Geraldine", coords: [-44.0978, 171.2366] },
+  { name: "Fairlie", coords: [-44.1022, 170.8290] },
+  { name: "Lake Pukaki", coords: [-44.1772, 170.1667] },
+];
+
+// ========================
+// BUILD SIDEBAR
+// ========================
+const dayList = document.getElementById('day-list');
+
+days.forEach((day, idx) => {
+  const card = document.createElement('div');
+  card.className = 'day-card';
+  card.id = `day-card-${day.id}`;
+  card.style.setProperty('--day-color', day.color);
+
+  let activitiesHTML = day.activities.map(a =>
+    `<div class="activity"><span class="dot"></span><span>${a}</span></div>`
+  ).join('');
+
+  let stayHTML = day.stay
+    ? `<div class="stay-tag">🏠 ${day.stay}</div>`
+    : '';
+
+  card.innerHTML = `
+    <div class="day-header">
+      <div class="day-badge">${day.id}</div>
+      <div class="day-meta">
+        <div class="day-label">${day.label}</div>
+        <div class="day-date">${day.date}</div>
+        <div class="day-location">📍 ${day.location}</div>
+      </div>
+    </div>
+    <div class="day-activities">
+      ${activitiesHTML}
+      ${stayHTML}
+    </div>
+  `;
+
+  card.addEventListener('click', () => {
+    // Deactivate all
+    document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+    // Fly to location on map
+    map.flyTo(day.coords, 11, { duration: 1.2 });
+    // Open popup
+    if (markers[idx]) {
+      markers[idx].openPopup();
+    }
+  });
+
+  dayList.appendChild(card);
+});
+
+// ========================
+// INIT MAP
+// ========================
+const map = L.map('map', {
+  center: [-44.2, 170.5],
+  zoom: 7,
+  zoomControl: false
+});
+
+// Dark tile layer (CartoDB Dark Matter)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© OpenStreetMap contributors © CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
+// Move zoom control
+L.control.zoom({ position: 'topright' }).addTo(map);
+
+// ========================
+// ROUTE POLYLINES
+// ========================
+// Main route (unique locations only)
+const routeCoords = [
+  [-43.5321, 172.6362], // Christchurch
+  [-44.0038, 170.4786], // Lake Tekapo
+  [-43.7359, 170.0966], // Mt Cook
+  [-45.0132, 168.9481], // Gibbston Valley
+  [-45.0312, 168.6626], // Queenstown
+];
+
+const routeLine = L.polyline(routeCoords, {
+  color: '#58a6ff',
+  weight: 2.5,
+  opacity: 0.6,
+  dashArray: '8, 6',
+  lineJoin: 'round'
+}).addTo(map);
+
+// D2 drive pit stop path (Chch → Tekapo with stops)
+const d2Path = [
+  [-43.5321, 172.6362], // Christchurch
+  [-43.9036, 171.7280], // Ashburton
+  [-43.6276, 171.6497], // Methven
+  [-43.5800, 171.4200], // Rakaia Gorge
+  [-44.0978, 171.2366], // Geraldine
+  [-44.1022, 170.8290], // Fairlie
+  [-44.0038, 170.4786], // Lake Tekapo
+];
+
+L.polyline(d2Path, {
+  color: '#3fb950',
+  weight: 1.5,
+  opacity: 0.35,
+  dashArray: '4, 5'
+}).addTo(map);
+
+// Lake Pukaki stop (D4)
+const d4Path = [
+  [-44.0038, 170.4786], // Tekapo
+  [-44.1772, 170.1667], // Lake Pukaki
+  [-43.7359, 170.0966], // Mt Cook
+];
+
+L.polyline(d4Path, {
+  color: '#f0883e',
+  weight: 1.5,
+  opacity: 0.35,
+  dashArray: '4, 5'
+}).addTo(map);
+
+// ========================
+// PIT STOP MARKERS (small)
+// ========================
+pitStops.forEach(stop => {
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #3fb950;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      opacity: 0.7;
+    "></div>`,
+    iconSize: [8, 8],
+    iconAnchor: [4, 4]
+  });
+
+  L.marker(stop.coords, { icon })
+    .bindTooltip(stop.name, {
+      direction: 'top',
+      offset: [0, -6],
+      className: 'route-label'
+    })
+    .addTo(map);
+});
+
+// ========================
+// DAY MARKERS
+// ========================
+// Group days by location to avoid stacking
+const locationGroups = {};
+days.forEach((day, idx) => {
+  const key = `${day.coords[0]},${day.coords[1]}`;
+  if (!locationGroups[key]) locationGroups[key] = [];
+  locationGroups[key].push({ day, idx });
+});
+
+const markers = new Array(days.length).fill(null);
+
+days.forEach((day, idx) => {
+  const size = day.id === 9 ? 32 : 40;
+
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="custom-marker" style="
+      width: ${size}px; height: ${size}px;
+      background: ${day.color};
+      font-size: ${day.id === 9 ? 10 : 13}px;
+    ">${day.id === 9 ? '✈️' : day.id}</div>`,
+    iconSize: [size, size],
+    iconAnchor: [size/2, size/2]
+  });
+
+  // Offset duplicate location markers slightly
+  const key = `${day.coords[0]},${day.coords[1]}`;
+  const group = locationGroups[key];
+  const groupIdx = group.findIndex(g => g.idx === idx);
+  const offset = (groupIdx - (group.length - 1) / 2) * 0.008;
+
+  const markerCoords = [day.coords[0] + offset, day.coords[1]];
+
+  // Build popup HTML
+  let popupActivities = day.activities.map(a =>
+    `<li>${a}</li>`
+  ).join('');
+
+  let stayHTML = day.stay
+    ? `<div class="popup-stay">🏠 ${day.stay}</div>`
+    : '';
+
+  let driveHTML = day.drive
+    ? `<div class="drive-badge">🚗 ${day.drive}</div>`
+    : '';
+
+  const popupContent = `
+    <div class="popup-inner" style="--popup-color: ${day.color}">
+      <div class="popup-day-badge">${day.label} · ${day.date}</div>
+      <div class="popup-location">📍 ${day.location}</div>
+      ${driveHTML}
+      <ul class="popup-items">${popupActivities}</ul>
+      ${stayHTML}
+    </div>
+  `;
+
+  const marker = L.marker(markerCoords, { icon })
+    .bindPopup(popupContent, {
+      maxWidth: 280,
+      closeButton: true
+    })
+    .addTo(map);
+
+  // Sync sidebar on popup open
+  marker.on('popupopen', () => {
+    document.querySelectorAll('.day-card').forEach(c => c.classList.remove('active'));
+    const card = document.getElementById(`day-card-${day.id}`);
+    if (card) {
+      card.classList.add('active');
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  });
+
+  markers[idx] = marker;
+});
+
+// ========================
+// LOCATION LABELS
+// ========================
+const locationLabels = [
+  { name: "Christchurch", coords: [-43.5321, 172.6362] },
+  { name: "Lake Tekapo", coords: [-44.0038, 170.4786] },
+  { name: "Aoraki / Mt Cook", coords: [-43.7359, 170.0966] },
+  { name: "Gibbston Valley", coords: [-45.0132, 168.9481] },
+  { name: "Queenstown", coords: [-45.0312, 168.6626] },
+];
+
+locationLabels.forEach(loc => {
+  L.marker(loc.coords, {
+    icon: L.divIcon({
+      className: '',
+      html: `<div style="
+        background: rgba(22,27,34,0.8);
+        border: 1px solid #30363d;
+        border-radius: 6px;
+        padding: 3px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        color: #c9d1d9;
+        white-space: nowrap;
+        margin-top: 28px;
+        margin-left: -40px;
+      ">${loc.name}</div>`,
+      iconSize: [0, 0]
+    })
+  }).addTo(map);
+});
+
+// ========================
+// LEGEND
+// ========================
+const legendEl = document.createElement('div');
+legendEl.className = 'legend';
+legendEl.innerHTML = `
+  <div class="legend-title">Route</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> Main route</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> D2 drive stops</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div> Lake Pukaki stop</div>
+  <div class="legend-item" style="margin-top:8px; font-size:10px; color:#8b949e;">Click any marker for details</div>
+`;
+document.querySelector('.main').appendChild(legendEl);
+legendEl.style.cssText += 'position:absolute;bottom:28px;right:12px;z-index:1000;';
+
+</script>
+</body>
+</html>
