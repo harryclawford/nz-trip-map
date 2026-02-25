@@ -152,11 +152,10 @@ header {
 .lodging-card {
   margin: 0 16px 12px; padding: 12px 14px;
   background: #1c2128; border: 1px solid #30363d; border-radius: 10px;
-  cursor: pointer; transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 .lodging-card:first-of-type { margin-top: 12px; }
-.lodging-card:hover { border-color: #58a6ff; }
-.lodging-card.active { border-color: #3fb950; background: #1a2518; }
+.lodging-card:hover { border-color: #3fb950; }
 .lodging-name { font-size: 13px; font-weight: 600; color: #e6edf3; margin-bottom: 4px; }
 .lodging-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .lodging-type {
@@ -165,17 +164,16 @@ header {
   border-radius: 8px; padding: 2px 7px;
 }
 .lodging-price { font-size: 11px; color: #f0883e; font-weight: 600; }
-.lodging-note { font-size: 11px; color: #8b949e; line-height: 1.5; }
+.lodging-note { font-size: 11px; color: #8b949e; line-height: 1.5; margin-bottom: 10px; }
 
 /* ══ DINING CARD ══ */
 .dining-card {
   margin: 0 16px 12px; padding: 12px 14px;
   background: #1c2128; border: 1px solid #30363d; border-radius: 10px;
-  cursor: pointer; transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 .dining-card:first-of-type { margin-top: 12px; }
 .dining-card:hover { border-color: #f0883e; }
-.dining-card.active { border-color: #f0883e; background: #21180f; }
 .dining-name { font-size: 13px; font-weight: 600; color: #e6edf3; margin-bottom: 4px; }
 .dining-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
 .dining-type {
@@ -188,7 +186,22 @@ header {
   display: flex; align-items: flex-start; gap: 5px; line-height: 1.4;
 }
 .dining-dish::before { content: '🍴'; font-size: 10px; flex-shrink: 0; margin-top: 1px; }
-.dining-vibe { font-size: 11px; color: #8b949e; font-style: italic; line-height: 1.4; }
+.dining-vibe { font-size: 11px; color: #8b949e; font-style: italic; line-height: 1.4; margin-bottom: 10px; }
+
+/* ══ CARD ACTION BUTTONS ══ */
+.card-actions { display: flex; gap: 8px; margin-top: 2px; }
+.card-btn {
+  flex: 1; padding: 7px 10px; border-radius: 8px; border: 1px solid #30363d;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+  cursor: pointer; text-decoration: none; text-align: center;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  transition: all 0.15s ease; background: #0d1117; color: #c9d1d9;
+}
+.card-btn:hover { border-color: #58a6ff; color: #58a6ff; background: rgba(88,166,255,0.08); }
+.card-btn.book { border-color: rgba(63,185,80,0.4); color: #3fb950; background: rgba(63,185,80,0.06); }
+.card-btn.book:hover { border-color: #3fb950; background: rgba(63,185,80,0.12); }
+.card-btn.maps { border-color: rgba(88,166,255,0.3); color: #79c0ff; background: rgba(88,166,255,0.06); }
+.card-btn.maps:hover { border-color: #58a6ff; background: rgba(88,166,255,0.12); }
 
 /* ══ POPUP STYLES ══ */
 .leaflet-popup-content-wrapper {
@@ -374,13 +387,17 @@ const locations = [
         name: "The George Hotel",
         type: "Boutique Hotel", price: "$$$",
         note: "Best address in Christchurch. Parkside location, impeccable service, beautiful rooms.",
-        coords: [-43.5274, 172.6417]
+        coords: [-43.5274, 172.6417],
+        bookingUrl: "https://www.thegeorge.com/",
+        mapsUrl: "https://maps.google.com/?q=The+George+Hotel+Christchurch"
       },
       {
         name: "Eliza's Manor",
         type: "Heritage B&B", price: "$$",
         note: "Victorian mansion, 10 min walk to city centre. Elegant, personal, great breakfast.",
-        coords: [-43.5315, 172.6381]
+        coords: [-43.5315, 172.6381],
+        bookingUrl: "https://www.booking.com/hotel/nz/elizas-manor.html",
+        mapsUrl: "https://maps.google.com/?q=Elizas+Manor+Christchurch"
       }
     ],
     dining: [
@@ -389,21 +406,24 @@ const locations = [
         type: "All-day brunch café",
         dish: "Smashed avo toast + cold brew",
         vibe: "☀️ Best brunch spot in CHC — lively, packed on weekends",
-        coords: [-43.5292, 172.6368]
+        coords: [-43.5292, 172.6368],
+        mapsUrl: "https://maps.google.com/?q=Hello+Sunday+Christchurch+NZ"
       },
       {
         name: "Fiddlesticks",
         type: "Wine bar / restaurant",
         dish: "Local pinot noir + shared boards",
         vibe: "🍷 Sophisticated but relaxed — perfect first-night dinner",
-        coords: [-43.5301, 172.6352]
+        coords: [-43.5301, 172.6352],
+        mapsUrl: "https://maps.google.com/?q=Fiddlesticks+Christchurch+NZ"
       },
       {
         name: "The Pog",
         type: "Gastropub",
         dish: "Burger + whatever's on tap",
         vibe: "🍺 Chill spot if you just want to decompress after the flight",
-        coords: [-43.5310, 172.6340]
+        coords: [-43.5310, 172.6340],
+        mapsUrl: "https://maps.google.com/?q=The+Pog+Christchurch+NZ"
       }
     ]
   },
@@ -415,13 +435,17 @@ const locations = [
         name: "Peppers Bluewater Resort",
         type: "Lakefront Resort", price: "$$$",
         note: "Right on the lakefront. Stunning turquoise views, spa, outdoor hot pools. The one.",
-        coords: [-44.0042, 170.4751]
+        coords: [-44.0042, 170.4751],
+        bookingUrl: "https://www.peppers.co.nz/bluewater/",
+        mapsUrl: "https://maps.google.com/?q=Peppers+Bluewater+Resort+Lake+Tekapo"
       },
       {
         name: "Tailor Made Tekapo",
         type: "Boutique B&B", price: "$$",
         note: "Small, cozy, hosts are legends. Private hot tub with direct lake views. Feels like home.",
-        coords: [-44.0058, 170.4802]
+        coords: [-44.0058, 170.4802],
+        bookingUrl: "https://www.tekapohostelnz.com/",
+        mapsUrl: "https://maps.google.com/?q=Tailor+Made+Tekapo+Accommodation"
       }
     ],
     dining: [
@@ -430,21 +454,24 @@ const locations = [
         type: "Japanese",
         dish: "Salmon sashimi (local Mt Cook salmon — seriously)",
         vibe: "🍣 Surprisingly legit Japanese in the middle of NZ's south island",
-        coords: [-44.0031, 170.4789]
+        coords: [-44.0031, 170.4789],
+        mapsUrl: "https://maps.google.com/?q=Kohan+Restaurant+Lake+Tekapo"
       },
       {
         name: "Mackenzie's Bar & Grill",
         type: "NZ Classic",
         dish: "Lamb rack + Mackenzie Basin pinot",
         vibe: "🥩 Classic NZ cooking, solid every time, lake views",
-        coords: [-44.0044, 170.4777]
+        coords: [-44.0044, 170.4777],
+        mapsUrl: "https://maps.google.com/?q=Mackenzies+Bar+Grill+Lake+Tekapo"
       },
       {
         name: "Run 76 Café",
         type: "Café",
         dish: "Flat white + cabinet food",
         vibe: "☕ Morning fuel before the Peninsula Walkway",
-        coords: [-44.0022, 170.4801]
+        coords: [-44.0022, 170.4801],
+        mapsUrl: "https://maps.google.com/?q=Run+76+Cafe+Lake+Tekapo"
       }
     ]
   },
@@ -456,13 +483,17 @@ const locations = [
         name: "The Hermitage Hotel",
         type: "Iconic Mountain Hotel", price: "$$$",
         note: "THE Mt Cook hotel. Panoramic Aoraki views, been here since 1884. Book the mountain-view room.",
-        coords: [-43.7359, 170.0966]
+        coords: [-43.7359, 170.0966],
+        bookingUrl: "https://www.hermitage.co.nz/stay/hermitage-hotel/",
+        mapsUrl: "https://maps.google.com/?q=The+Hermitage+Hotel+Mt+Cook"
       },
       {
         name: "Glentanner Park Centre",
         type: "Cabins / Glamping", price: "$",
         note: "Campsites and self-contained cabins at the base of Aoraki. Budget pick with epic views.",
-        coords: [-43.8050, 170.1000]
+        coords: [-43.8050, 170.1000],
+        bookingUrl: "https://www.glentanner.co.nz/",
+        mapsUrl: "https://maps.google.com/?q=Glentanner+Park+Centre+Mt+Cook"
       }
     ],
     dining: [
@@ -471,14 +502,16 @@ const locations = [
         type: "Café / Bar",
         dish: "Venison pie + Speight's Old Dark",
         vibe: "🏔️ Legendary. Alpine hikers fuel up here. Best views of Aoraki while you eat.",
-        coords: [-43.7355, 170.0972]
+        coords: [-43.7355, 170.0972],
+        mapsUrl: "https://maps.google.com/?q=Old+Mountaineers+Cafe+Mt+Cook+Village"
       },
       {
         name: "Panorama Restaurant",
         type: "Fine dining",
         dish: "Set degustation menu with mountain views",
         vibe: "✨ Splurge night — floor-to-ceiling windows facing Aoraki. Worth it once.",
-        coords: [-43.7361, 170.0960]
+        coords: [-43.7361, 170.0960],
+        mapsUrl: "https://maps.google.com/?q=Panorama+Restaurant+Hermitage+Mt+Cook"
       }
     ]
   },
@@ -490,13 +523,17 @@ const locations = [
         name: "Kinross Cottages",
         type: "Vineyard Cottage", price: "$$$",
         note: "Sleep in the vineyard. Wake up to rows of pinot noir. Cellar door 50m from your door.",
-        coords: [-45.0120, 168.9450]
+        coords: [-45.0120, 168.9450],
+        bookingUrl: "https://kinross.nz/pages/vineyard-cottages",
+        mapsUrl: "https://maps.google.com/?q=Kinross+Gibbston+Valley+Queenstown"
       },
       {
-        name: "Amisfield Winery Accommodation",
+        name: "Amisfield Winery",
         type: "Wine Estate Stay", price: "$$$",
         note: "Beautiful estate stay. One of NZ's best pinot producers. Book months in advance.",
-        coords: [-44.9890, 168.8950]
+        coords: [-44.9890, 168.8950],
+        bookingUrl: "https://amisfield.co.nz/",
+        mapsUrl: "https://maps.google.com/?q=Amisfield+Winery+Queenstown"
       }
     ],
     dining: [
@@ -505,21 +542,24 @@ const locations = [
         type: "Farm-to-table fine dining",
         dish: "'Trust the chef' menu — no menu, all seasonal",
         vibe: "🌿 One of NZ's best restaurants. Seriously. Book ahead.",
-        coords: [-44.9890, 168.8950]
+        coords: [-44.9890, 168.8950],
+        mapsUrl: "https://maps.google.com/?q=Amisfield+Bistro+Queenstown"
       },
       {
         name: "Peregrine Wines",
         type: "Cellar door tasting",
         dish: "Pinot Noir flight + cheese board",
         vibe: "🍷 Iconic NZ modernist architecture + award-winning wine",
-        coords: [-45.0035, 168.9200]
+        coords: [-45.0035, 168.9200],
+        mapsUrl: "https://maps.google.com/?q=Peregrine+Wines+Gibbston+Valley"
       },
       {
         name: "Kinross Cellar Door & Kitchen",
         type: "Wine bar",
         dish: "Pinot Gris + shared plates",
         vibe: "🍇 Relaxed, unpretentious tasting right in the valley",
-        coords: [-45.0120, 168.9450]
+        coords: [-45.0120, 168.9450],
+        mapsUrl: "https://maps.google.com/?q=Kinross+Cellar+Door+Gibbston"
       }
     ]
   },
@@ -531,13 +571,17 @@ const locations = [
         name: "QT Queenstown",
         type: "Design Hotel", price: "$$$",
         note: "Quirky, bold design hotel. Best rooftop bar views in QT. Right on the lakefront.",
-        coords: [-45.0302, 168.6598]
+        coords: [-45.0302, 168.6598],
+        bookingUrl: "https://www.qthotels.com/queenstown/",
+        mapsUrl: "https://maps.google.com/?q=QT+Hotel+Queenstown+New+Zealand"
       },
       {
-        name: "The Dairy Private Luxury Hotel",
+        name: "The Dairy Private Hotel",
         type: "Boutique Hotel", price: "$$$$",
         note: "Only 13 rooms. Converted 1920s dairy. Most personal hospitality in Queenstown.",
-        coords: [-45.0321, 168.6642]
+        coords: [-45.0321, 168.6642],
+        bookingUrl: "https://thedairy.co.nz/",
+        mapsUrl: "https://maps.google.com/?q=The+Dairy+Private+Hotel+Queenstown"
       }
     ],
     dining: [
@@ -546,21 +590,24 @@ const locations = [
         type: "Legendary burger joint",
         dish: "The Ferg (double beef) — no modifications",
         vibe: "🍔 Non-negotiable. Queue is part of the experience. Open till 5am.",
-        coords: [-45.0315, 168.6628]
+        coords: [-45.0315, 168.6628],
+        mapsUrl: "https://maps.google.com/?q=Fergburger+Queenstown"
       },
       {
         name: "Rata",
         type: "Fine dining NZ",
         dish: "Venison + Central Otago pinot pairing",
         vibe: "✨ Josh Emett's restaurant. Serious food, serious wine list.",
-        coords: [-45.0308, 168.6601]
+        coords: [-45.0308, 168.6601],
+        mapsUrl: "https://maps.google.com/?q=Rata+Restaurant+Queenstown"
       },
       {
         name: "Botswana Butchery",
         type: "Steakhouse",
         dish: "Eye fillet with lake view",
         vibe: "🥩 Power dinner vibes. Lakefront terrace. Dress up slightly.",
-        coords: [-45.0301, 168.6589]
+        coords: [-45.0301, 168.6589],
+        mapsUrl: "https://maps.google.com/?q=Botswana+Butchery+Queenstown"
       }
     ]
   }
@@ -721,13 +768,17 @@ function renderLodging() {
         </div>
       </div>
       ${loc.lodging.map((l, i) => `
-        <div class="lodging-card" id="lodging-${loc.id}-${i}" onclick="focusLodging(${JSON.stringify(loc.coords).replace(/"/g,"'")}, ${JSON.stringify(l.coords).replace(/"/g,"'")})">
+        <div class="lodging-card" id="lodging-${loc.id}-${i}">
           <div class="lodging-name">${l.name}</div>
           <div class="lodging-meta">
             <span class="lodging-type">${l.type}</span>
             <span class="lodging-price">${l.price}</span>
           </div>
           <div class="lodging-note">${l.note}</div>
+          <div class="card-actions">
+            <a href="${l.bookingUrl}" target="_blank" rel="noopener" class="card-btn book">🏨 Book</a>
+            <a href="${l.mapsUrl}" target="_blank" rel="noopener" class="card-btn maps">📍 Maps</a>
+          </div>
         </div>
       `).join('')}
     `;
@@ -751,13 +802,16 @@ function renderDining() {
         </div>
       </div>
       ${loc.dining.map((d, i) => `
-        <div class="dining-card" id="dining-${loc.id}-${i}" onclick="focusDining(${JSON.stringify(loc.coords).replace(/"/g,"'")}, ${JSON.stringify(d.coords).replace(/"/g,"'")})">
+        <div class="dining-card" id="dining-${loc.id}-${i}">
           <div class="dining-name">${d.name}</div>
           <div class="dining-meta">
             <span class="dining-type">${d.type}</span>
           </div>
           <div class="dining-dish">${d.dish}</div>
           <div class="dining-vibe">${d.vibe}</div>
+          <div class="card-actions">
+            <a href="${d.mapsUrl}" target="_blank" rel="noopener" class="card-btn maps">📍 Google Maps</a>
+          </div>
         </div>
       `).join('')}
     `;
