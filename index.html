@@ -75,18 +75,25 @@ header {
   .stat:nth-child(3), .stat:nth-child(4) { display: none; }
   #map { left: 0; right: 0; bottom: 0; }
   .sidebar {
-    bottom: 0; left: 0; right: 0; height: 92px;
+    bottom: 0; left: 0; right: 0; height: 110px;
     border-top: 1px solid #30363d; border-radius: 18px 18px 0 0;
     transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .sidebar.open { height: 74dvh; }
   .sidebar-handle {
-    display: flex !important; justify-content: center; padding: 10px 0 6px; cursor: pointer; flex-shrink: 0;
+    display: flex !important; justify-content: center; padding: 10px 0 4px; cursor: pointer; flex-shrink: 0;
   }
   .sidebar-handle::before {
     content: ''; width: 36px; height: 4px; background: #484f58; border-radius: 2px; display: block;
   }
-  .tab-btn { font-size: 10px; padding: 8px 2px; }
+  .tab-btn {
+    font-size: 13px;
+    padding: 14px 4px;
+    gap: 6px;
+    flex-direction: column;
+  }
+  .tab-btn .tab-icon { font-size: 20px; }
+  .tab-btn .tab-label { font-size: 11px; font-weight: 600; }
   .sidebar-toggle-hint { display: none; }
 }
 
@@ -260,9 +267,9 @@ header {
 <div class="sidebar" id="sidebar">
   <div class="sidebar-handle" id="sidebar-handle"></div>
   <div class="tab-bar" id="tab-bar">
-    <button class="tab-btn active t-itinerary" data-tab="itinerary">📍 Itinerary</button>
-    <button class="tab-btn t-lodging" data-tab="lodging">🏠 Lodging</button>
-    <button class="tab-btn t-dining" data-tab="dining">🍽️ Dining</button>
+    <button class="tab-btn active t-itinerary" data-tab="itinerary"><span class="tab-icon">📍</span><span class="tab-label">Itinerary</span></button>
+    <button class="tab-btn t-lodging" data-tab="lodging"><span class="tab-icon">🏠</span><span class="tab-label">Lodging</span></button>
+    <button class="tab-btn t-dining" data-tab="dining"><span class="tab-icon">🍽️</span><span class="tab-label">Dining</span></button>
   </div>
   <div id="tab-content"></div>
 </div>
@@ -852,6 +859,10 @@ map.on('click', () => {
 
 // Init
 renderItinerary();
+
+// Fix Leaflet tile rendering after layout settles
+setTimeout(() => map.invalidateSize(), 100);
+window.addEventListener('resize', () => map.invalidateSize());
 
 </script>
 </body>
