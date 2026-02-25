@@ -13,80 +13,78 @@
     font-family: 'Inter', sans-serif;
     background: #0d1117;
     color: #e6edf3;
+    overflow: hidden;
     height: 100vh;
     height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
   }
 
-  /* HEADER */
+  /* ══════════════════════════════
+     HEADER
+  ══════════════════════════════ */
   header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 56px;
     background: linear-gradient(135deg, #161b22 0%, #1a2332 100%);
     border-bottom: 1px solid #30363d;
-    padding: 12px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 16px;
     z-index: 1000;
-    flex-shrink: 0;
   }
 
   .header-title {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
   }
 
-  .nz-flag { font-size: 22px; }
+  .nz-flag { font-size: 20px; flex-shrink: 0; }
 
   .header-title h1 {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     color: #58a6ff;
-    letter-spacing: -0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .header-title p {
     font-size: 11px;
     color: #8b949e;
-    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .header-stats {
     display: flex;
-    gap: 16px;
+    gap: 12px;
+    flex-shrink: 0;
   }
 
   .stat { text-align: center; }
-  .stat .val { font-size: 16px; font-weight: 700; color: #58a6ff; }
-  .stat .lbl { font-size: 9px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat .val { font-size: 15px; font-weight: 700; color: #58a6ff; line-height: 1.2; }
+  .stat .lbl { font-size: 9px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.4px; }
 
-  /* MAIN LAYOUT */
-  .main {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* MAP */
+  /* ══════════════════════════════
+     SHARED: map + sidebar fixed
+  ══════════════════════════════ */
   #map {
-    flex: 1;
-    background: #0d1117;
+    position: fixed;
+    top: 56px;
     z-index: 1;
   }
 
-  /* ── DESKTOP SIDEBAR ── */
   .sidebar {
-    width: 340px;
+    position: fixed;
     background: #161b22;
-    border-right: 1px solid #30363d;
-    overflow-y: auto;
-    flex-shrink: 0;
-    scrollbar-width: thin;
-    scrollbar-color: #30363d #161b22;
-    z-index: 2;
+    z-index: 500;
+    overflow: hidden;
   }
 
   .sidebar::-webkit-scrollbar { width: 4px; }
@@ -94,8 +92,6 @@
   .sidebar::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
 
   .sidebar-header {
-    padding: 16px 20px 12px;
-    border-bottom: 1px solid #21262d;
     font-size: 11px;
     font-weight: 600;
     color: #8b949e;
@@ -103,60 +99,63 @@
     letter-spacing: 0.8px;
   }
 
-  /* ── MOBILE BOTTOM SHEET ── */
-  @media (max-width: 640px) {
-    .header-title p { display: none; }
-    .stat .val { font-size: 14px; }
-    .stat:nth-child(3), .stat:nth-child(4) { display: none; }
+  /* ══════════════════════════════
+     DESKTOP (≥ 641px)
+  ══════════════════════════════ */
+  @media (min-width: 641px) {
+    .sidebar-handle, .sidebar-toggle-hint { display: none !important; }
 
-    .main { flex-direction: column; }
-
-    #map {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
+    .sidebar {
+      top: 56px; left: 0; bottom: 0;
+      width: 340px;
+      border-right: 1px solid #30363d;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #30363d #161b22;
     }
 
-    /* Bottom sheet */
+    .sidebar-header { padding: 16px 20px 12px; border-bottom: 1px solid #21262d; }
+
+    #map { left: 340px; right: 0; bottom: 0; }
+  }
+
+  /* ══════════════════════════════
+     MOBILE (≤ 640px) — bottom sheet
+  ══════════════════════════════ */
+  @media (max-width: 640px) {
+    #map { left: 0; right: 0; bottom: 0; }
+
     .sidebar {
-      position: absolute;
       bottom: 0; left: 0; right: 0;
-      width: 100%;
-      height: 52px; /* collapsed: just the handle + header */
-      max-height: 80dvh;
-      border-right: none;
+      height: 58px;
       border-top: 1px solid #30363d;
-      border-radius: 20px 20px 0 0;
-      z-index: 500;
-      overflow: hidden;
-      transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      background: #161b22;
+      border-radius: 18px 18px 0 0;
+      transition: height 0.32s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .sidebar.open {
-      height: 70dvh;
+      height: 72dvh;
       overflow-y: auto;
     }
 
     .sidebar-handle {
       display: flex !important;
       justify-content: center;
-      align-items: center;
-      padding: 10px 0 4px;
+      padding: 10px 0 2px;
       cursor: pointer;
-      flex-shrink: 0;
     }
 
     .sidebar-handle::before {
       content: '';
-      width: 36px;
-      height: 4px;
+      width: 36px; height: 4px;
       background: #484f58;
       border-radius: 2px;
+      display: block;
     }
 
     .sidebar-header {
-      padding: 8px 20px 10px;
+      padding: 6px 16px 10px;
+      border-bottom: 1px solid #21262d;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -167,12 +166,18 @@
       display: inline-block !important;
       font-size: 10px;
       color: #58a6ff;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
     }
   }
 
-  @media (min-width: 641px) {
-    .sidebar-handle { display: none; }
-    .sidebar-toggle-hint { display: none; }
+  /* ══════════════════════════════
+     MOBILE LAYOUT (≤ 640px)
+  ══════════════════════════════ */
+  @media (max-width: 640px) {
+    .header-title p { display: none; }
+    .stat:nth-child(3), .stat:nth-child(4) { display: none; }
   }
 
   /* DAY CARDS */
@@ -501,19 +506,17 @@
   </div>
 </header>
 
-<div class="main">
-  <!-- MAP -->
-  <div id="map"></div>
+<!-- MAP -->
+<div id="map"></div>
 
-  <!-- SIDEBAR / MOBILE BOTTOM SHEET -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-handle" id="sidebar-handle"></div>
-    <div class="sidebar-header" id="sidebar-header">
-      📍 Day-by-Day Itinerary
-      <span class="sidebar-toggle-hint">tap to expand ↑</span>
-    </div>
-    <div id="day-list"></div>
+<!-- SIDEBAR / MOBILE BOTTOM SHEET -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-handle" id="sidebar-handle"></div>
+  <div class="sidebar-header" id="sidebar-header">
+    📍 Day-by-Day Itinerary
+    <span class="sidebar-toggle-hint">tap to expand ↑</span>
   </div>
+  <div id="day-list"></div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -974,8 +977,8 @@ legendEl.innerHTML = `
   <div class="legend-item"><div class="legend-dot" style="background:#f0883e"></div> Lake Pukaki stop</div>
   <div class="legend-item" style="margin-top:8px; font-size:10px; color:#8b949e;">Tap any marker for details</div>
 `;
-document.querySelector('.main').appendChild(legendEl);
-legendEl.style.cssText += 'position:absolute;bottom:70px;right:12px;z-index:1000;';
+document.body.appendChild(legendEl);
+legendEl.style.cssText += 'position:fixed;bottom:70px;right:12px;z-index:1000;';
 
 // ========================
 // MOBILE BOTTOM SHEET
@@ -1007,6 +1010,7 @@ map.on('click', () => {
     sidebar.classList.remove('open');
     if (toggleHint) toggleHint.textContent = 'tap to expand ↑';
     legendEl.style.bottom = '70px';
+    legendEl.style.position = 'fixed';
   }
 });
 
